@@ -1,13 +1,15 @@
 import * as PIXI from 'pixi.js';
 import { app, Application } from '../../index';
-import { IResourceDictionary, Loader } from 'pixi.js';
-import { LoaderResourceNames } from '../constants/loader-constants';
+import { IResourceDictionary } from 'pixi.js';
+import { LoaderNames, LoaderResourceNames } from '../constants/loader-constants';
+import { centeringItem } from '../../utils';
 
 export default class LoaderView extends PIXI.Container {
     public app: Application;
     public background: PIXI.Graphics;
     private loaderBg: PIXI.Sprite;
     private loaderBar: PIXI.Sprite;
+    private titleText: PIXI.Text;
     private loaderBarOriginalWidth: number;
 
     constructor() {
@@ -24,23 +26,33 @@ export default class LoaderView extends PIXI.Container {
         this.loaderBg = new PIXI.Sprite(resources[LoaderResourceNames.LOADER_BG].texture);
         this.loaderBar = new PIXI.Sprite(resources[LoaderResourceNames.LOADER_BAR].texture);
 
-        this.loaderBg.x = (this.app.view.width - this.loaderBg.width) / 2;
-        this.loaderBg.y = (this.app.view.height - this.loaderBg.height) / 2;
-        this.loaderBar.x = (this.app.view.width - this.loaderBar.width) / 2;
-        this.loaderBar.y = (this.app.view.height - this.loaderBar.height) / 2;
+        this.loaderBg.position = centeringItem(this.app.view, this.loaderBg);
+        this.loaderBar.position = centeringItem(this.app.view, this.loaderBar);
         this.loaderBarOriginalWidth = this.loaderBar.width;
-        this.loaderBar.width = 0
+        this.loaderBar.width = 0;
+
+        this.titleText = new PIXI.Text(LoaderNames.TITLE, {
+            fill: '#acacac',
+            fontFamily: 'Verdana',
+            fontSize: 25,
+            miterLimit: 15,
+            strokeThickness: 6,
+            stroke: '#2d2d2d'
+        });
+        this.titleText.position = centeringItem(this.app.view, this.titleText);
+        this.titleText.y -= this.loaderBar.height + 15;
 
         this.addChild(this.background);
         this.addChild(this.loaderBg);
         this.addChild(this.loaderBar);
+        this.addChild(this.titleText);
 
     }
 
 
     public updateProgressBar(progress: number): void {
-        if(this.loaderBar) {
-            this.loaderBar.width = this.loaderBarOriginalWidth / 100 * progress
+        if (this.loaderBar) {
+            this.loaderBar.width = this.loaderBarOriginalWidth / 100 * progress;
         }
     }
 

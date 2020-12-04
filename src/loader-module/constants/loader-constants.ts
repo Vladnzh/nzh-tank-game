@@ -18,5 +18,7 @@ export class LoaderResourceNames {
     static readonly TANK_ENEMY_RED = 'enemyRed';
     static readonly TANK_ENEMY_WHITE = 'enemyWhite';
     static readonly START_BUTTON = 'startButton';
-
+}
+export class LoaderNames {
+    static readonly TITLE = 'Loading...';
 }

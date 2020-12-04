@@ -20,7 +20,6 @@ export class Application extends PIXI.Application {
             resolution: 1,
         });
         document.getElementById('root').appendChild(this.view);
-
         this.onResize();
         window.addEventListener('resize', _.debounce(() => app.onResize(), 300));
     }

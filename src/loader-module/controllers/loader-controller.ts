@@ -1,14 +1,13 @@
 import * as PIXI from 'pixi.js';
-import LoaderModel from '../models/loader-model';
 import LoaderView from '../views/loader-view';
 import { IResourceDictionary, Loader } from 'pixi.js';
 import { LoaderResourceNames } from '../constants/loader-constants';
 import _ from 'lodash';
 import { app } from '../../index';
 import { StateNames } from '../../state-machine/constants/state-machine-constants';
+import { TweenMax } from "gsap";
 
 export default class LoaderController extends PIXI.Loader {
-    protected model: LoaderModel;
     protected view: LoaderView;
     protected progressBarLoader: PIXI.Loader;
 
@@ -19,7 +18,6 @@ export default class LoaderController extends PIXI.Loader {
 
     public init(): void {
         this.loadResources();
-        this.model = new LoaderModel();
         this.view = new LoaderView();
     }
 
@@ -75,6 +73,11 @@ export default class LoaderController extends PIXI.Loader {
     }
 
     public hideView(): void {
-        this.view.visible = false;
+        TweenMax.to(this.view, 1, {
+            alpha: 0,
+            onComplete: () => {
+                this.view.visible = false;
+            },
+        });
     }
 }

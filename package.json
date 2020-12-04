@@ -13,6 +13,9 @@
     "license": "ISC",
     "dependencies": {
         "@pixi/filter-color-overlay": "^3.1.1",
+        "@types/greensock": "^1.15.32",
+        "@types/gsap": "^1.20.2",
+        "gsap": "^3.5.1",
         "lodash": "^4.17.20",
         "pixi.js": "^5.3.3"
     },
