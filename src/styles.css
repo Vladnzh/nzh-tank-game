@@ -1,0 +1,9 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #05121E;
+    overflow: hidden;
+    display: flex;
+    box-sizing: border-box;
+}
+

@@ -1,0 +1,48 @@
+{
+    "name": "digicode-test",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "NODE_ENV=production node server",
+        "dev": "NODE_ENV=development node server",
+        "build": "webpack --mode production"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@pixi/filter-color-overlay": "^3.1.1",
+        "lodash": "^4.17.20",
+        "pixi.js": "^5.3.3"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.10.3",
+        "@babel/preset-env": "^7.10.3",
+        "@babel/preset-typescript": "^7.10.1",
+        "@types/lodash": "^4.14.157",
+        "@types/node": "^14.0.13",
+        "@types/pixi.js": "^5.0.0",
+        "@typescript-eslint/eslint-plugin": "^3.3.0",
+        "@typescript-eslint/parser": "^3.3.0",
+        "babel-loader": "^8.1.0",
+        "css-loader": "^3.6.0",
+        "error-overlay-webpack-plugin": "^0.4.1",
+        "eslint": "^7.2.0",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-plugin-prettier": "^3.1.4",
+        "express": "^4.17.1",
+        "extract-text-webpack-plugin": "^3.0.2",
+        "mini-css-extract-plugin": "^0.9.0",
+        "path": "^0.12.7",
+        "prettier": "^2.0.5",
+        "style-loader": "^1.2.1",
+        "ts-loader": "^7.0.5",
+        "typescript": "^3.9.5",
+        "webpack": "^4.43.0",
+        "webpack-cli": "^3.3.12",
+        "webpack-dev-middleware": "^3.7.2",
+        "webpack-dev-server": "^3.11.0",
+        "webpack-hot-middleware": "^2.25.0"
+    }
+}
