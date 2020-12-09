@@ -6,7 +6,7 @@ import { EVENT_NAMES, StartGameNames } from '../constants/start-game-constants';
 import { centeringItem } from '../../utils';
 import { StateNames } from '../../state-machine/constants/state-machine-constants';
 
-export default class StartGameView extends PIXI.Container {
+export default class EndGameView extends PIXI.Container {
     public app: Application;
     public background: PIXI.Graphics;
     public startButton: PIXI.Sprite;
@@ -21,7 +21,7 @@ export default class StartGameView extends PIXI.Container {
     public drawView(resources?: IResourceDictionary): void {
         this.visible = false;
         this.background = new PIXI.Graphics();
-        this.titleText = new PIXI.Text(StartGameNames.TITLE, {
+        this.titleText = new PIXI.Text("END GAME", {
             dropShadow: true,
             dropShadowAlpha: 0.2,
             dropShadowBlur: 4,
@@ -48,9 +48,9 @@ export default class StartGameView extends PIXI.Container {
         this.titleText.position = centeringItem(this.app.view, this.titleText);
         this.titleText.y -= this.startButton.height;
         this.addChild(this.background);
-        this.addChild(this.startButton);
+        // this.addChild(this.startButton);
         this.addChild(this.titleText);
-        this.addInteractive();
+        // this.addInteractive();
     }
 
     protected addInteractive(): void {

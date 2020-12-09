@@ -1,17 +1,20 @@
-import StartGameView from '../views/start-game-view';
+import MapView from '../views/map-view';
 import { IResourceDictionary } from 'pixi.js';
-import { app } from '../../index';
 import { TweenMax } from 'gsap';
+import { app } from '../../index';
 
-export default class StartGameController {
-    protected view: StartGameView;
+export default class MapController {
+    protected view: MapView;
 
     constructor() {
         this.init();
     }
 
+    public getView(): MapView {
+       return  this.view
+    }
     public init(): void {
-        this.view = new StartGameView();
+        this.view = new MapView();
     }
 
     public drawView(): void {

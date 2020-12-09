@@ -29,8 +29,12 @@ export class StateMachine {
                 app.startGameModule.showView();
                 break;
             }
-            case StateNames.GAME_STATE : {
+            case StateNames.MAIN_GAME_STATE : {
                 app.startGameModule.hideView();
+                app.mainGameModule.showView();
+                break;
+            }
+            case StateNames.END_GAME_STATE : {
                 break;
             }
         }

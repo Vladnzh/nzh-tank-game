@@ -1,17 +1,17 @@
-import StartGameView from '../views/start-game-view';
+import EndGameView from '../views/end-game-view';
 import { IResourceDictionary } from 'pixi.js';
 import { app } from '../../index';
 import { TweenMax } from 'gsap';
 
-export default class StartGameController {
-    protected view: StartGameView;
+export default class EndGameController {
+    protected view: EndGameView;
 
     constructor() {
         this.init();
     }
 
     public init(): void {
-        this.view = new StartGameView();
+        this.view = new EndGameView();
     }
 
     public drawView(): void {
@@ -25,7 +25,8 @@ export default class StartGameController {
         this.view.visible = true
         TweenMax.to(this.view, 1, {
             alpha: 1,
-        });    }
+        });
+    }
 
     public hideView(): void {
         TweenMax.to(this.view, 1, {
