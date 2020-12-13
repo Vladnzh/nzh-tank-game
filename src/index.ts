@@ -6,6 +6,7 @@ import { StateMachine } from './state-machine/state-machine';
 import StartGame from './start-game-module/controllers/start-game-controller';
 import EndGame from './end-game-module/controllers/end-game-controller';
 import MainGame from './main-game-module/controllers/main-game-controller';
+import MapView from './main-game-module/views/map-view';
 
 export class Application extends PIXI.Application {
     protected size: Array<number> = [1024, 768];
@@ -26,6 +27,10 @@ export class Application extends PIXI.Application {
         document.getElementById('root').appendChild(this.view);
         this.onResize();
         window.addEventListener('resize', _.debounce(() => app.onResize(), 300));
+    }
+
+    get mapView(): MapView {
+        return this.mainGameModule.map.view;
     }
 
     public init() {

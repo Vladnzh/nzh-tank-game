@@ -1,9 +1,13 @@
-import MapView from '../views/map-view';
+import * as PIXI from 'pixi.js';
 
-export default class BoardController {
-    protected view: MapView;
+export default class BoardModel extends PIXI.Sprite {
+    protected type: string;
 
-    constructor() {
+    constructor(texture: PIXI.Texture, type: string, i: number, j: number) {
+        super(texture);
+        this.x = this.width * j;
+        this.y = this.height * i;
+        this.type = type;
     }
 
 

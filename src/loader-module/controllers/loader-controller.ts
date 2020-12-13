@@ -47,6 +47,7 @@ export default class LoaderController extends PIXI.Loader {
             .add(LoaderResourceNames.TANK_ENEMY_RED, 'tanks/enemy_red.png')
             .add(LoaderResourceNames.TANK_ENEMY_WHITE, 'tanks/enemy_white.png')
             .add(LoaderResourceNames.START_BUTTON, 'button.png')
+            .add(LoaderResourceNames.BULLET, 'bullet.png')
             .load();
 
         this.onProgress.add(this.onProgressCallBack.bind(this));

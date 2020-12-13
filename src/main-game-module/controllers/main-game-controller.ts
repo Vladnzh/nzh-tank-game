@@ -5,8 +5,8 @@ import { TweenMax } from 'gsap';
 import MapController from './map-controller';
 
 export default class MainGameController {
-    protected view: MainGameView;
-    protected map: MapController;
+    public view: MainGameView;
+    public map: MapController;
 
     constructor() {
         this.init();
