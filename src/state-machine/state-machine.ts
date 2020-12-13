@@ -1,4 +1,4 @@
-import { StateNames } from './constants/state-machine-constants';
+import { StateNames } from './state-machine-constants';
 import { app } from '../index';
 
 export class StateMachine {

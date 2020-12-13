@@ -1,28 +1,32 @@
-import EndGameView from '../views/end-game-view';
+import MainGameView from './main-game-view';
 import { IResourceDictionary } from 'pixi.js';
 import { app } from '../../index';
 import { TweenMax } from 'gsap';
+import MapController from './map/map-controller';
 
-export default class EndGameController {
-    protected view: EndGameView;
+export default class MainGameController {
+    public view: MainGameView;
+    public map: MapController;
 
     constructor() {
         this.init();
     }
 
     public init(): void {
-        this.view = new EndGameView();
+        this.view = new MainGameView();
+        this.map = new MapController();
     }
 
     public drawView(): void {
-        const resources: IResourceDictionary = app.loader.resources;
-        this.view.drawView(resources);
+        this.map.drawView();
+        const mapView = this.map.getView();
+        this.view.addChild(mapView);
     }
 
     public showView(): void {
         this.drawView();
-        this.view.alpha = 0
-        this.view.visible = true
+        this.view.alpha = 0;
+        this.view.visible = true;
         TweenMax.to(this.view, 1, {
             alpha: 1,
         });

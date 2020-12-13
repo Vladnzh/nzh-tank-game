@@ -1,8 +1,8 @@
 import * as PIXI from 'pixi.js';
-import { app } from '../../index';
-import { LoaderResourceNames } from '../../loader-module/constants/loader-constants';
+import { app } from '../../../../index';
+import { DIRECTION_NAMES, ElementTypeNames } from '../../../constants';
 
-export default class BulletController {
+export default class Bullet {
     protected ticker: PIXI.Ticker;
     private OFFSET: number = 23;
     protected type: string;
@@ -10,7 +10,8 @@ export default class BulletController {
     public shellSprite: PIXI.Sprite;
 
     constructor(direction: string, x: number, y: number) {
-        this.shellSprite = new PIXI.Sprite(app.loader.resources[LoaderResourceNames.BULLET].texture);
+        const texture = app.loader.getTextureByTypeName(ElementTypeNames.BULLET);
+        this.shellSprite = new PIXI.Sprite(texture);
         this.currentDirection = direction;
         this.setPosition(x, y);
         this.shellSprite.anchor.set(0.5);
@@ -18,26 +19,31 @@ export default class BulletController {
         this.ticker.add(() => this.update());
         this.ticker.start();
         app.mapView.addChild(this.shellSprite);
+        app.collisionLogic.addBullet(this);
+    }
+
+    public stop(): void {
+        this.ticker.stop();
     }
 
     protected setPosition(x: number, y: number) {
         switch (this.currentDirection) {
-            case 'UP' : {
+            case DIRECTION_NAMES.UP : {
                 this.shellSprite.x = x;
                 this.shellSprite.y = y - this.OFFSET;
                 break;
             }
-            case 'LEFT' : {
+            case DIRECTION_NAMES.LEFT : {
                 this.shellSprite.x = x - this.OFFSET;
                 this.shellSprite.y = y;
                 break;
             }
-            case 'DOWN' : {
+            case DIRECTION_NAMES.DOWN : {
                 this.shellSprite.x = x;
                 this.shellSprite.y = y + this.OFFSET;
                 break;
             }
-            case 'RIGHT' : {
+            case DIRECTION_NAMES.RIGHT : {
                 this.shellSprite.x = x + this.OFFSET;
                 this.shellSprite.y = y;
                 break;
@@ -46,20 +52,22 @@ export default class BulletController {
     }
 
     public update(): void {
+        app.collisionLogic.findBulletCollision(this);
+
         switch (this.currentDirection) {
-            case 'UP' : {
+            case DIRECTION_NAMES.UP : {
                 this.shellSprite.y -= 2.5;
                 break;
             }
-            case 'LEFT' : {
+            case DIRECTION_NAMES.LEFT : {
                 this.shellSprite.x -= 2.5;
                 break;
             }
-            case 'DOWN' : {
+            case DIRECTION_NAMES.DOWN : {
                 this.shellSprite.y += 2.5;
                 break;
             }
-            case 'RIGHT' : {
+            case DIRECTION_NAMES.RIGHT : {
                 this.shellSprite.x += 2.5;
                 break;
             }
@@ -69,6 +77,5 @@ export default class BulletController {
             }
         }
     }
-
 }
 

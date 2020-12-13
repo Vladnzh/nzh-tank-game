@@ -1,12 +1,13 @@
 import './styles.css';
 import * as PIXI from 'pixi.js';
-import Loader from './loader-module/controllers/loader-controller';
+import Loader from './modules/loader-module/loader-controller';
 import _ from 'lodash';
 import { StateMachine } from './state-machine/state-machine';
-import StartGame from './start-game-module/controllers/start-game-controller';
-import EndGame from './end-game-module/controllers/end-game-controller';
-import MainGame from './main-game-module/controllers/main-game-controller';
-import MapView from './main-game-module/views/map-view';
+import StartGame from './modules/start-game-module/start-game-controller';
+import EndGame from './modules/end-game-module/end-game-controller';
+import MainGame from './modules/main-game-module/main-game-controller';
+import MapView from './modules/main-game-module/map/map-view';
+import CollisionLogic from './modules/main-game-module/collision-logic';
 
 export class Application extends PIXI.Application {
     protected size: Array<number> = [1024, 768];
@@ -15,6 +16,7 @@ export class Application extends PIXI.Application {
     public startGameModule: StartGame;
     public mainGameModule: MainGame;
     public endGameModule: EndGame;
+    public collisionLogic: CollisionLogic;
 
     constructor() {
         super();
@@ -36,6 +38,7 @@ export class Application extends PIXI.Application {
     public init() {
         this.stateMachine = new StateMachine();
         this.loader = new Loader();
+        this.collisionLogic = new CollisionLogic();
         this.startGameModule = new StartGame();
         this.mainGameModule = new MainGame();
         this.endGameModule = new EndGame();

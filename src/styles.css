@@ -6,7 +6,4 @@ body {
     display: flex;
     box-sizing: border-box;
 }
-canvas {
-    border: 1px solid royalblue;
-}
 

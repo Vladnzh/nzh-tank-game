@@ -1,10 +1,8 @@
 import * as PIXI from 'pixi.js';
 import { app, Application } from '../../index';
 import { IResourceDictionary } from 'pixi.js';
-import { LoaderResourceNames } from '../../loader-module/constants/loader-constants';
-import { EVENT_NAMES, StartGameNames } from '../constants/main-game-constants';
 import { centeringItem } from '../../utils';
-import { StateNames } from '../../state-machine/constants/state-machine-constants';
+import { StateNames } from '../../state-machine/state-machine-constants';
 
 export default class MainGameView extends PIXI.Container {
     public app: Application;

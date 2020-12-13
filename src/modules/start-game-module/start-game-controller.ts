@@ -1,6 +1,4 @@
-import StartGameView from '../views/start-game-view';
-import { IResourceDictionary } from 'pixi.js';
-import { app } from '../../index';
+import StartGameView from './start-game-view';
 import { TweenMax } from 'gsap';
 
 export default class StartGameController {
@@ -15,8 +13,7 @@ export default class StartGameController {
     }
 
     public drawView(): void {
-        const resources: IResourceDictionary = app.loader.resources;
-        this.view.drawView(resources);
+        this.view.drawView();
     }
 
     public showView(): void {

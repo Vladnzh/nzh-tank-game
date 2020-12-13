@@ -1,16 +1,14 @@
-import MapView from '../views/map-view';
-import { IResourceDictionary } from 'pixi.js';
+import MapView from './map-view';
 import { TweenMax } from 'gsap';
-import { app } from '../../index';
+import { app } from '../../../index';
 import PIXI from 'pixi.js';
-import { LoaderResourceNames } from '../../loader-module/constants/loader-constants';
-import { mapMatrix } from '../../utils';
-import BoardModel from '../models/board-model';
-import TankController from './tank-controller';
+import { mapMatrix } from '../../../utils';
+import Board from './elements/board';
+import Tank from './elements/tank';
+import { ElementTypeNames } from '../../constants';
 
 export default class MapController {
     public view: MapView;
-    protected resources: IResourceDictionary;
 
     constructor() {
         this.init();
@@ -22,8 +20,6 @@ export default class MapController {
 
     public init(): void {
         this.view = new MapView();
-        this.resources = app.loader.resources;
-
     }
 
     public drawView(): void {
@@ -61,31 +57,39 @@ export default class MapController {
                 }
             }
         }
+        this.view.sortChildren()
     };
 
     protected addBoardByIndex(index: number, i: number, j: number) {
         let sprite: PIXI.Sprite;
+        let texture: PIXI.Texture;
 
         switch (index) {
             case 1: {
-                sprite = new BoardModel(this.resources[LoaderResourceNames.WALL].texture, LoaderResourceNames.WALL, i, j);
+                texture = app.loader.getTextureByTypeName(ElementTypeNames.WALL);
+                sprite = new Board(texture, ElementTypeNames.WALL, i, j);
                 break;
             }
             case 3: {
-                sprite = new BoardModel(this.resources[LoaderResourceNames.LEAVES].texture, LoaderResourceNames.LEAVES, i, j);
+                texture = app.loader.getTextureByTypeName(ElementTypeNames.LEAVES);
+                sprite = new Board(texture, ElementTypeNames.LEAVES, i, j);
+                sprite.zIndex = 1
                 break;
             }
             case 4: {
-                sprite = new BoardModel(this.resources[LoaderResourceNames.WATER].texture, LoaderResourceNames.WATER, i, j);
+                texture = app.loader.getTextureByTypeName(ElementTypeNames.WATER);
+                sprite = new Board(texture, ElementTypeNames.WATER, i, j);
                 break;
             }
             case 5: {
-                const tank = new TankController(this.resources[LoaderResourceNames.TANK].texture, LoaderResourceNames.TANK, i, j);
+                texture = app.loader.getTextureByTypeName(ElementTypeNames.TANK);
+                const tank = new Tank(texture, ElementTypeNames.TANK, i, j);
                 sprite = tank.tankSprite;
                 break;
             }
             case 6: {
-                sprite = new BoardModel(this.resources[LoaderResourceNames.TANK_ENEMY_RED].texture, LoaderResourceNames.TANK_ENEMY_RED, i, j);
+                texture = app.loader.getTextureByTypeName(ElementTypeNames.TANK_ENEMY_RED);
+                sprite = new Board(texture, ElementTypeNames.TANK_ENEMY_RED, i, j);
                 break;
             }
         }
@@ -93,9 +97,10 @@ export default class MapController {
     };
 
     protected addBoardFromSmallBoard(i: number, j: number) {
-        let board: BoardModel;
+        let board: Board;
         for (let k = 0; k <= 3; k++) {
-            board = new BoardModel(this.resources[LoaderResourceNames.SMALL_WALL_1].texture, LoaderResourceNames.SMALL_WALL_1, i, j);
+            const texture = app.loader.getTextureByTypeName(ElementTypeNames.SMALL_WALL_1);
+            board = new Board(texture, ElementTypeNames.SMALL_WALL_1, i, j);
             switch (k) {
                 case 0: {
                     board.x = board.width * 2 * j;

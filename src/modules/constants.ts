@@ -1,4 +1,19 @@
-export class LoaderResourceNames {
+export class StartGameNames {
+    static readonly TITLE = 'THE TANKS';
+}
+export class EVENT_NAMES {
+    static readonly MOUSEDOWN = 'mousedown';
+    static readonly MOUSEUP = 'mouseup';
+    static readonly KEYDOWN = 'keydown';
+    static readonly KEYUP = 'keyup';
+}
+export class DIRECTION_NAMES {
+    static readonly DOWN = 'DOWN';
+    static readonly UP = 'UP';
+    static readonly LEFT = 'LEFT';
+    static readonly RIGHT = 'RIGHT';
+}
+export class ElementTypeNames {
     static readonly LOADER_BAR = 'loaderBar';
     static readonly LOADER_BG = 'loaderBg';
     static readonly EAGLE = 'eagle';

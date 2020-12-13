@@ -1,8 +1,8 @@
 import * as PIXI from 'pixi.js';
 import { app, Application } from '../../index';
 import { IResourceDictionary } from 'pixi.js';
-import { LoaderNames, LoaderResourceNames } from '../constants/loader-constants';
 import { centeringItem } from '../../utils';
+import { ElementTypeNames, LoaderNames } from '../constants';
 
 export default class LoaderView extends PIXI.Container {
     public app: Application;
@@ -23,8 +23,8 @@ export default class LoaderView extends PIXI.Container {
         this.background.beginFill(0x0b2335);
         this.background.drawRect(0, 0, app.view.width, app.view.height);
         this.background.endFill();
-        this.loaderBg = new PIXI.Sprite(resources[LoaderResourceNames.LOADER_BG].texture);
-        this.loaderBar = new PIXI.Sprite(resources[LoaderResourceNames.LOADER_BAR].texture);
+        this.loaderBg = new PIXI.Sprite(resources[ElementTypeNames.LOADER_BG].texture);
+        this.loaderBar = new PIXI.Sprite(resources[ElementTypeNames.LOADER_BAR].texture);
 
         this.loaderBg.position = centeringItem(this.app.view, this.loaderBg);
         this.loaderBar.position = centeringItem(this.app.view, this.loaderBar);

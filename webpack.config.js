@@ -36,9 +36,9 @@ const config = {
     resolve: {
         extensions: ['.ts', '.js'],
         alias: {
-            controllers: path.resolve(__dirname, 'src/controllers'),
+            controllers: path.resolve(__dirname, 'src/controller'),
             models: path.resolve(__dirname, 'src/models'),
-            views: path.resolve(__dirname, 'src/views'),
+            views: path.resolve(__dirname, 'src/view'),
         },
     },
     devServer: {
