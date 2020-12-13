@@ -35,10 +35,9 @@ export default class CollisionLogic {
         });
     }
 
-    public checkCanMove(tank: Tank): boolean {
-        return !Boolean(this.boards.find((board: Board) => {
-            return this.boxesIntersect(tank.tankSprite, board);
-        }));
+
+    public findTankCollision(tank: Tank): Board {
+        return this.boards.find((board: Board) => this.boxesIntersect(tank.tankSprite, board));
     }
 
     private boxesIntersect(a: any, b: any): boolean {
