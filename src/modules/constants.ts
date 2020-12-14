@@ -35,6 +35,14 @@ export class ElementTypeNames {
     static readonly START_BUTTON = 'startButton';
     static readonly BULLET = 'bullet';
 }
+
+export class AnimationsNames {
+    static readonly ANIMATIONS = 'animations';
+    static readonly APPEAR_SPRITE = 'appear';
+    static readonly EXPLODE_SPRITE = 'explode';
+    static readonly EXPLODE_SMALL_SPRITE = 'explode_small';
+}
+
 export class LoaderNames {
     static readonly TITLE = 'Loading...';
 }

@@ -1,11 +1,11 @@
 import * as PIXI from 'pixi.js';
 import LoaderView from './loader-view';
-import { IResourceDictionary, Loader } from 'pixi.js';
+import { AnimatedSprite, IResourceDictionary, Loader, Sprite } from 'pixi.js';
 import _ from 'lodash';
 import { app } from '../../index';
 import { StateNames } from '../../state-machine/state-machine-constants';
 import { TweenMax } from 'gsap';
-import { ElementTypeNames } from '../constants';
+import { AnimationsNames, ElementTypeNames } from '../constants';
 
 export default class LoaderController extends PIXI.Loader {
     protected view: LoaderView;
@@ -48,6 +48,7 @@ export default class LoaderController extends PIXI.Loader {
             .add(ElementTypeNames.TANK_ENEMY_WHITE, 'tanks/enemy_white.png')
             .add(ElementTypeNames.START_BUTTON, 'button.png')
             .add(ElementTypeNames.BULLET, 'bullet.png')
+            .add(AnimationsNames.ANIMATIONS, 'animations.json')
             .load();
 
         this.onProgress.add(this.onProgressCallBack.bind(this));
@@ -71,6 +72,10 @@ export default class LoaderController extends PIXI.Loader {
         if (!_.isNil(this.view)) {
             this.view.updateProgressBar(e.progress);
         }
+    }
+
+    public getAnimation(name: string): AnimatedSprite {
+        return new PIXI.AnimatedSprite(this.resources[AnimationsNames.ANIMATIONS].spritesheet.animations[name]);
     }
 
     protected onCompleteCallBack(e: Loader): void {

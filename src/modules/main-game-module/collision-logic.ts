@@ -24,6 +24,7 @@ export default class CollisionLogic {
     public findBulletCollision(bullet: Bullet) {
         _.forEach(this.boards, (board: Board, index) => {
             if (this.boxesIntersect(bullet.shellSprite, board) && board.type != ElementTypeNames.LEAVES) {
+                bullet.playAnimation();
                 bullet.stop();
                 app.mapView.removeChild(bullet.shellSprite);
                 if (board.type === ElementTypeNames.SMALL_WALL_1) {

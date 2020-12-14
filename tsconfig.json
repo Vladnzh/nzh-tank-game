@@ -10,8 +10,8 @@
         "declaration": true,
         "baseUrl": ".",
         "esModuleInterop": true,
-        "typeRoots" : ["node_modules/pixi.js"],
-        "types" : ["pixi.js", "@pixi/filter-color-overlay"]
+        "typeRoots" : ["node_modules/pixi.js", "node_modules/pixi-spine"],
+        "types" : ["pixi.js", "@pixi/filter-color-overlay", "pixi-spine"]
     },
     "include": ["**/*.ts"],
     "exclude": ["node_modules"]

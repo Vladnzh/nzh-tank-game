@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { app } from '../../../../index';
-import { DIRECTION_NAMES, ElementTypeNames } from '../../../constants';
+import { AnimationsNames, DIRECTION_NAMES, ElementTypeNames } from '../../../constants';
+import { AnimatedSprite } from 'pixi.js';
 
 export default class Bullet {
     protected ticker: PIXI.Ticker;
@@ -51,9 +52,21 @@ export default class Bullet {
         }
     }
 
+    public playAnimation() {
+        const animation: AnimatedSprite = app.loader.getAnimation(AnimationsNames.EXPLODE_SMALL_SPRITE);
+        animation.anchor.set(0.5)
+        animation.x = this.shellSprite.x;
+        animation.y = this.shellSprite.y;
+        animation.loop = false;
+        animation.play()
+        app.mapView.addChild(animation)
+        animation.onComplete = () => {
+            app.mapView.removeChild(animation)
+        };
+    }
+
     public update(): void {
         app.collisionLogic.findBulletCollision(this);
-
         switch (this.currentDirection) {
             case DIRECTION_NAMES.UP : {
                 this.shellSprite.y -= 2.5;
