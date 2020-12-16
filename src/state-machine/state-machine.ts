@@ -2,24 +2,17 @@ import { StateNames } from './state-machine-constants';
 import { app } from '../index';
 
 export class StateMachine {
-    private states: Array<string> = [];
+    private prevState: string;
     private currentState: string;
 
-    public addState(stateName: string): void {
-        this.states.push(stateName);
-    }
-
     public changeState(newStateName: string): void {
+        this.prevState = this.currentState;
         this.currentState = newStateName;
-        console.log(`%cCURRENT STATE: ${this.currentState}`, "color: Orange");
         this.stateChanged();
     }
 
-    public getCurrentState(): string {
-        return this.currentState;
-    }
-
     public stateChanged(): void {
+        this.log()
         switch (this.currentState) {
             case StateNames.LOADER_STATE : {
                 break;
@@ -30,14 +23,23 @@ export class StateMachine {
                 break;
             }
             case StateNames.MAIN_GAME_STATE : {
+                if (this.prevState === StateNames.END_GAME_STATE) {
+                    app.endGameModule.hideView();
+                }
                 app.startGameModule.hideView();
                 app.mainGameModule.showView();
                 break;
             }
             case StateNames.END_GAME_STATE : {
+                app.mainGameModule.hideView();
+                app.endGameModule.showView();
                 break;
             }
         }
+    }
+
+    private log(): void {
+        console.log(`%cCURRENT STATE: ${this.currentState}`, 'color: Orange');
     }
 
 }

@@ -79,7 +79,7 @@ export default class LoaderController extends PIXI.Loader {
     }
 
     protected onCompleteCallBack(e: Loader): void {
-        app.stateMachine.changeState(StateNames.START_GAME_STATE);
+        TweenMax.delayedCall(1, () => app.stateMachine.changeState(StateNames.START_GAME_STATE));
     }
 
     public hideView(): void {

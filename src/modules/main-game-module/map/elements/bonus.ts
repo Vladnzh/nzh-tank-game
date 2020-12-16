@@ -1,17 +1,14 @@
 import * as PIXI from 'pixi.js';
-import { app } from '../../../../index';
 import { DefaultTextureSize } from '../../../constants';
 
-export default class Board extends PIXI.Sprite {
+export default class Bonus extends PIXI.Sprite {
     public type: string;
 
     constructor(texture: PIXI.Texture, type: string, i: number, j: number) {
         super(texture);
-        this.x = DefaultTextureSize.WIDTH * j;
-        this.y = DefaultTextureSize.HEIGHT * i;
+        this.x = DefaultTextureSize.WIDTH * j + 2;
+        this.y = DefaultTextureSize.HEIGHT * i + 2;
         this.type = type;
-        app.mainGameModule.collisionLogic.addBoard(this)
+        // app.collisionLogic.addBoard(this)
     }
-
-
 }

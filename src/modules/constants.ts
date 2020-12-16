@@ -42,6 +42,10 @@ export class AnimationsNames {
     static readonly EXPLODE_SPRITE = 'explode';
     static readonly EXPLODE_SMALL_SPRITE = 'explode_small';
 }
+export class DefaultTextureSize {
+    static readonly WIDTH = 36;
+    static readonly HEIGHT = 36;
+}
 
 export class LoaderNames {
     static readonly TITLE = 'Loading...';

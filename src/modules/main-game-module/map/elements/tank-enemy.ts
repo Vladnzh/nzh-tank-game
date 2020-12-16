@@ -1,27 +1,22 @@
 import * as PIXI from 'pixi.js';
 import Bullet from './bullet';
-import { DefaultTextureSize, DIRECTION_NAMES, ElementTypeNames, EVENT_NAMES } from '../../../constants';
+import { AnimationsNames, DefaultTextureSize, DIRECTION_NAMES, ElementTypeNames } from '../../../constants';
 import { app } from '../../../../index';
 import Board from './board';
 import { TimelineLite } from 'gsap';
-import { ColorOverlayFilter } from '@pixi/filter-color-overlay';
-import TankEnemy from './tank-enemy';
-import { StateNames } from '../../../../state-machine/state-machine-constants';
-import { TypeItemsCollision } from '../../../../interfaces';
+import Tank from './tank';
+import { AnimatedSprite } from 'pixi.js';
 
-export default class Tank extends PIXI.Container {
+export default class TankEnemy extends PIXI.Container {
     public type: string;
     private RECHARGE_MARK_OFFSET: number = 3.5;
     protected ticker: PIXI.Ticker;
     protected speed: number = 1;
-    protected rechargeSpeed: number = 1.5;
     protected bullet: Bullet;
     protected currentDirection: string;
-    protected rechargeTimeline: TimelineLite;
     protected rechargeMark: PIXI.Graphics;
     protected inMove: boolean;
     protected isDrown: boolean = false;
-    protected inRecharge: boolean = false;
     public tankSprite: PIXI.Sprite;
 
     constructor(texture: PIXI.Texture, type: string, i: number, j: number) {
@@ -32,31 +27,17 @@ export default class Tank extends PIXI.Container {
         this.tankSprite.y = DefaultTextureSize.HEIGHT * i + DefaultTextureSize.HEIGHT / 2;
         this.tankSprite.anchor.set(0.5);
         this.ticker = new PIXI.Ticker();
-        this.ticker.add(() => this.update());
-        this.ticker.start();
-        this.addListeners();
         this.rechargeMark = new PIXI.Graphics();
         this.rechargeMark.beginFill(0x4df546);
         this.rechargeMark.drawRect(0, 0, this.tankSprite.width, 3);
         this.rechargeMark.endFill();
         this.rechargeMark.alpha = 0.8;
+        this.ticker.add(() => this.update());
+        this.ticker.start();
         this.addChild(this.tankSprite);
-        this.addChild(this.rechargeMark);
-        app.mainGameModule.collisionLogic.addTank(this);
-        this.rechargeMark.x = this.tankSprite.x - (this.tankSprite.width / 2);
-        this.rechargeMark.y = this.tankSprite.y + (this.tankSprite.height / 2);
+        app.mainGameModule.collisionLogic.addEnemyTank(this);
     }
 
-    private addListeners(): void {
-        document.addEventListener(EVENT_NAMES.KEYDOWN, (e: KeyboardEvent) => {
-            this.ticker.start();
-            this.setKeyDown(e.keyCode);
-        });
-        document.addEventListener(EVENT_NAMES.KEYUP, (e: KeyboardEvent) => {
-            this.ticker.start();
-            this.setKeyUP(e.keyCode);
-        });
-    }
 
     public update(): void {
         if (this.isDrown) {
@@ -100,15 +81,14 @@ export default class Tank extends PIXI.Container {
                 break;
             }
         }
-        const collisionBoard: TypeItemsCollision = app.mainGameModule.collisionLogic.findTankCollision(this);
-        // console.log(collisionBoard);
+        const collisionBoard: Board | Tank | TankEnemy = app.mainGameModule.collisionLogic.findTankCollision(this);
         this.setSpeed(1);
         if (collisionBoard) {
             this.onCollisionHappened(collisionBoard);
         }
     }
 
-    protected onCollisionHappened(collisionBoard: TypeItemsCollision): void {
+    protected onCollisionHappened(collisionBoard: Board | Tank | TankEnemy): void {
         if (collisionBoard.type === ElementTypeNames.WATER) {
             this.onDrown(collisionBoard);
             return;
@@ -155,68 +135,24 @@ export default class Tank extends PIXI.Container {
         });
         tl.add(() => {
             this.tankSprite.visible = false;
-            app.stateMachine.changeState(StateNames.END_GAME_STATE);
         });
     }
 
-    public setKeyDown(code: number): void {
-        switch (code) {
-            case 87 || 38 : {
-                this.inMove = true;
-                this.currentDirection = DIRECTION_NAMES.UP;
-                break;
-            }
-            case 65 || 37 : {
-                this.inMove = true;
-                this.currentDirection = DIRECTION_NAMES.LEFT;
-                break;
-            }
-            case 83 || 40 : {
-                this.inMove = true;
-                this.currentDirection = DIRECTION_NAMES.DOWN;
-                break;
-            }
-            case 68 || 39 : {
-                this.inMove = true;
-                this.currentDirection = DIRECTION_NAMES.RIGHT;
-                break;
-            }
-        }
-
+    public onExplode(): void {
+        this.playAnimation();
     }
 
-    protected onRecharge(): void {
-        this.rechargeMark.width = 0;
-        this.rechargeMark.filters = [new ColorOverlayFilter(0xf53834)];
-        this.inRecharge = true;
-        this.rechargeTimeline = new TimelineLite();
-        this.rechargeTimeline.to(this.rechargeMark, this.rechargeSpeed, {
-            width: this.tankSprite.width,
-        });
-        this.rechargeTimeline.add(() => {
-            this.rechargeTimeline = null;
-            this.rechargeMark.filters = [];
-            this.inRecharge = false;
-        });
-    }
-
-    public setKeyUP(code: number): void {
-
-        switch (code) {
-            case 32: {
-                if (this.inRecharge) {
-                    return;
-                }
-                this.onRecharge();
-                const x = this.tankSprite.x;
-                const y = this.tankSprite.y;
-                this.bullet = new Bullet(this.currentDirection, x, y);
-                break;
-            }
-            default: {
-                this.inMove = false;
-            }
-        }
+    public playAnimation() {
+        const animation: AnimatedSprite = app.loader.getAnimation(AnimationsNames.EXPLODE_SPRITE);
+        animation.anchor.set(0.5);
+        animation.x = this.tankSprite.x;
+        animation.y = this.tankSprite.y;
+        animation.loop = false;
+        animation.play();
+        app.mapView.addChild(animation);
+        animation.onComplete = () => {
+            app.mapView.removeChild(animation);
+        };
     }
 
 }

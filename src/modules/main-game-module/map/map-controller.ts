@@ -6,6 +6,8 @@ import { mapMatrix } from '../../../utils';
 import Board from './elements/board';
 import Tank from './elements/tank';
 import { ElementTypeNames } from '../../constants';
+import TankEnemy from './elements/tank-enemy';
+import Bonus from './elements/bonus';
 
 export default class MapController {
     public view: MapView;
@@ -61,7 +63,7 @@ export default class MapController {
     };
 
     protected addBoardByIndex(index: number, i: number, j: number) {
-        let sprite: PIXI.Sprite;
+        let sprite: PIXI.Container;
         let texture: PIXI.Texture;
 
         switch (index) {
@@ -84,12 +86,37 @@ export default class MapController {
             case 5: {
                 texture = app.loader.getTextureByTypeName(ElementTypeNames.TANK);
                 const tank = new Tank(texture, ElementTypeNames.TANK, i, j);
-                sprite = tank.tankSprite;
+                sprite = tank;
                 break;
             }
             case 6: {
                 texture = app.loader.getTextureByTypeName(ElementTypeNames.TANK_ENEMY_RED);
-                sprite = new Board(texture, ElementTypeNames.TANK_ENEMY_RED, i, j);
+                sprite = new TankEnemy(texture, ElementTypeNames.TANK_ENEMY_RED, i, j);
+                break;
+            }
+            case 7: {
+                texture = app.loader.getTextureByTypeName(ElementTypeNames.EAGLE);
+                sprite = new Board(texture, ElementTypeNames.EAGLE, i, j);
+                break;
+            }
+            case 8: {
+                texture = app.loader.getTextureByTypeName(ElementTypeNames.BONUS_SPEED);
+                sprite = new Bonus(texture, ElementTypeNames.BONUS_SPEED, i, j);
+                break;
+            }
+            case 9: {
+                texture = app.loader.getTextureByTypeName(ElementTypeNames.BONUS_LIVE);
+                sprite = new Bonus(texture, ElementTypeNames.BONUS_LIVE, i, j);
+                break;
+            }
+            case 10: {
+                texture = app.loader.getTextureByTypeName(ElementTypeNames.BONUS_IMMORTAL);
+                sprite = new Bonus(texture, ElementTypeNames.BONUS_IMMORTAL, i, j);
+                break;
+            }
+            case 11: {
+                texture = app.loader.getTextureByTypeName(ElementTypeNames.BONUS_SLOW);
+                sprite = new Bonus(texture, ElementTypeNames.BONUS_SLOW, i, j);
                 break;
             }
         }

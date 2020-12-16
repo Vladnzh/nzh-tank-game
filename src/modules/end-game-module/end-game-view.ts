@@ -20,7 +20,7 @@ export default class EndGameView extends PIXI.Container {
     public drawView(resources?: IResourceDictionary): void {
         this.visible = false;
         this.background = new PIXI.Graphics();
-        this.titleText = new PIXI.Text("END GAME", {
+        this.titleText = new PIXI.Text("GAME OVER", {
             dropShadow: true,
             dropShadowAlpha: 0.2,
             dropShadowBlur: 4,
@@ -47,9 +47,9 @@ export default class EndGameView extends PIXI.Container {
         this.titleText.position = centeringItem(this.app.view, this.titleText);
         this.titleText.y -= this.startButton.height;
         this.addChild(this.background);
-        // this.addChild(this.startButton);
+        this.addChild(this.startButton);
         this.addChild(this.titleText);
-        // this.addInteractive();
+        this.addInteractive();
     }
 
     protected addInteractive(): void {

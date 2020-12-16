@@ -7,10 +7,6 @@ export default class EndGameController {
     protected view: EndGameView;
 
     constructor() {
-        this.init();
-    }
-
-    public init(): void {
         this.view = new EndGameView();
     }
 
@@ -21,8 +17,8 @@ export default class EndGameController {
 
     public showView(): void {
         this.drawView();
-        this.view.alpha = 0
-        this.view.visible = true
+        this.view.alpha = 0;
+        this.view.visible = true;
         TweenMax.to(this.view, 1, {
             alpha: 1,
         });
