@@ -22,6 +22,7 @@ export default class StartGameController {
     }
 
     public hideView(): void {
+        this.view.startButton.interactive = false;
         TweenMax.to(this.view, 1, {
             alpha: 0,
             onComplete: () => {

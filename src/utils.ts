@@ -1,10 +1,23 @@
 import * as PIXI from 'pixi.js';
 
-export const centeringItem = (view: HTMLCanvasElement | PIXI.Container, item: PIXI.Container ): PIXI.Point => {
+export const centeringItem = (view: HTMLCanvasElement | PIXI.Container, item: PIXI.Container): PIXI.Point => {
     const position = new PIXI.Point();
     position.x = (view.width - item.width) / 2;
     position.y = (view.height - item.height) / 2;
     return position;
+};
+
+
+export const itemsIntersect = (a: any, b: any): boolean => {
+    if (!a || !b) {
+        return false;
+    }
+    if (a.type === b.type) {
+        return false;
+    }
+    const ab = a.getBounds();
+    const bb = b.getBounds();
+    return ab.x + ab.width > bb.x && ab.x < bb.x + bb.width && ab.y + ab.height > bb.y && ab.y < bb.y + bb.height;
 };
 
 export const mapMatrix = [

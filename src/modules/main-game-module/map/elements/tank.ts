@@ -8,21 +8,24 @@ import { ColorOverlayFilter } from '@pixi/filter-color-overlay';
 import TankEnemy from './tank-enemy';
 import { StateNames } from '../../../../state-machine/state-machine-constants';
 import { TypeItemsCollision } from '../../../../interfaces';
+import { itemsIntersect } from '../../../../utils';
 
 export default class Tank extends PIXI.Container {
     public type: string;
+    public id: string;
     private RECHARGE_MARK_OFFSET: number = 3.5;
     protected ticker: PIXI.Ticker;
     protected speed: number = 1;
-    protected rechargeSpeed: number = 1.5;
+    protected rechargeSpeed: number = 0.2;
     protected bullet: Bullet;
-    protected currentDirection: string;
+    public currentDirection: string;
     protected rechargeTimeline: TimelineLite;
     protected rechargeMark: PIXI.Graphics;
     protected inMove: boolean;
     protected isDrown: boolean = false;
     protected inRecharge: boolean = false;
     public tankSprite: PIXI.Sprite;
+    public possibleCollision: Array<TypeItemsCollision>;
 
     constructor(texture: PIXI.Texture, type: string, i: number, j: number) {
         super();
@@ -43,6 +46,7 @@ export default class Tank extends PIXI.Container {
         this.addChild(this.tankSprite);
         this.addChild(this.rechargeMark);
         app.mainGameModule.collisionLogic.addTank(this);
+        this.updatePossibleCollision();
         this.rechargeMark.x = this.tankSprite.x - (this.tankSprite.width / 2);
         this.rechargeMark.y = this.tankSprite.y + (this.tankSprite.height / 2);
     }
@@ -100,12 +104,17 @@ export default class Tank extends PIXI.Container {
                 break;
             }
         }
-        const collisionBoard: TypeItemsCollision = app.mainGameModule.collisionLogic.findTankCollision(this);
-        // console.log(collisionBoard);
         this.setSpeed(1);
-        if (collisionBoard) {
-            this.onCollisionHappened(collisionBoard);
+        const collisionItem = this.possibleCollision?.find((item: TypeItemsCollision) =>
+            itemsIntersect(this, item));
+        if (collisionItem) {
+            this.onCollisionHappened(collisionItem);
         }
+    }
+
+    public updatePossibleCollision() {
+        this.possibleCollision = app.mainGameModule.collisionLogic.findTankPossibleCollision(this);
+        console.log(this.possibleCollision);
     }
 
     protected onCollisionHappened(collisionBoard: TypeItemsCollision): void {
@@ -182,6 +191,7 @@ export default class Tank extends PIXI.Container {
                 break;
             }
         }
+        this.updatePossibleCollision();
 
     }
 

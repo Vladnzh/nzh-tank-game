@@ -3,12 +3,13 @@ import Tank from './map/elements/tank';
 import Bullet from './map/elements/bullet';
 import _ from 'lodash';
 import { app } from '../../index';
-import { ElementTypeNames } from '../constants';
+import { DIRECTION_NAMES, ElementTypeNames } from '../constants';
 import TankEnemy from './map/elements/tank-enemy';
 import { TypeItemsCollision } from '../../interfaces';
-import { StateNames } from '../../state-machine/state-machine-constants';
+import { itemsIntersect } from '../../utils';
 
 export default class CollisionLogic {
+    protected ignoreCollisionForBullet: Array<string> = [ElementTypeNames.LEAVES, ElementTypeNames.WATER];
     protected boards: Array<Board> = [];
     protected itemsCollision: Array<TypeItemsCollision> = [];
     protected tanks: Array<Tank | TankEnemy> = [];
@@ -31,56 +32,59 @@ export default class CollisionLogic {
         this.itemsCollision.push(tank);
     }
 
-    public addBullet(board: Bullet) {
+    public addBullet(bullet: Bullet) {
+        this.bullets.push(bullet);
+    }
+
+    public removeBullet(bullet: Bullet) {
+        _.remove(this.bullets, (item: Bullet) => item?.id === bullet?.id);
+        app.mapView.removeChild(bullet.bulletSprite);
+        _.forEach(this.bullets, (item: Bullet) => item?.updatePossibleCollision());
+    }
+
+    public removeItem(collisionItem: TypeItemsCollision) {
+        if (collisionItem.type === ElementTypeNames.WALL) {
+            return;
+        }
+        _.remove(this.itemsCollision, (item: TypeItemsCollision) => item?.id === collisionItem?.id);
+        app.mapView.removeChild(collisionItem);
 
     }
 
-    public findBulletCollision(bullet: Bullet) {
-        _.forEach(this.itemsCollision, (item: TypeItemsCollision, index) => {
-            if (this.itemsIntersect(bullet.bulletSprite, item) && item.type != ElementTypeNames.LEAVES) {
-                bullet.playAnimation();
-                bullet.stop();
-                app.mapView.removeChild(bullet.bulletSprite);
-                if (item.type === ElementTypeNames.SMALL_WALL_1) {
-                    app.mapView.removeChild(item);
-                    item.destroy();
-                    this.itemsCollision.splice(index, 1);
-                    return;
-                }
-                app.mapView.removeChild(bullet.bulletSprite);
-                if (item.type === ElementTypeNames.TANK_ENEMY_RED) {
-                    (item as TankEnemy).onExplode();
-                    this.itemsCollision.splice(index, 1);
-                    app.mapView.removeChild(item);
-                    item.destroy();
-                    return;
-                }
-                if (item.type === ElementTypeNames.EAGLE) {
-                    this.itemsCollision.splice(index, 1);
-                    app.mapView.removeChild(item);
-                    app.stateMachine.changeState(StateNames.END_GAME_STATE);
-                    item.destroy();
-                    return;
-                }
-            }
-        });
+    public findBulletPossibleCollision(bullet: Bullet) {
+        this.addBullet(bullet);
+        if (bullet.currentDirection === DIRECTION_NAMES.LEFT) {
+            const collision: any = this.itemsCollision.filter((item) => {
+                return item.x < bullet.bulletSprite.x
+                    && item.y + item.height + 10 > bullet.bulletSprite.y
+                    && item.y < bullet.bulletSprite.y + bullet.bulletSprite.height + 10
+                    && item.type !== ElementTypeNames.LEAVES
+                    && item.type !== ElementTypeNames.WATER;
+            });
+            return collision;
+        }
+    }
+
+    public findTankPossibleCollision(tank: Tank) {
+        this.addTank(tank);
+        if (tank.currentDirection === DIRECTION_NAMES.LEFT) {
+            const collision: any = this.itemsCollision.filter((item: Board) => {
+                return item.x < tank.tankSprite.x - (tank.tankSprite.width)
+                    && item.y + item.height > tank.tankSprite.y
+                    && item.y < tank.tankSprite.y + tank.tankSprite.width
+                    && item.type !== ElementTypeNames.LEAVES
+                    && item.type !== ElementTypeNames.WATER;
+            });
+            // console.log('this.itemsCollision', this.itemsCollision);
+            // collision.map((item: Board) => app.mapView.removeChild(item));
+            return collision;
+        }
     }
 
     public findTankCollision(tank: Tank | TankEnemy): TypeItemsCollision {
         return this.itemsCollision.find((item: TypeItemsCollision) =>
-            this.itemsIntersect(tank, item));
+            itemsIntersect(tank, item));
     }
 
-    private itemsIntersect(a: any, b: any): boolean {
-        if (!a || !b) {
-            return false;
-        }
-        if (a.type === b.type) {
-            return false;
-        }
-        const ab = a.getBounds();
-        const bb = b.getBounds();
-        return ab.x + ab.width > bb.x && ab.x < bb.x + bb.width && ab.y + ab.height > bb.y && ab.y < bb.y + bb.height;
-    }
 
 }

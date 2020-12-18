@@ -8,6 +8,10 @@ import StartGame from './modules/start-game-module/start-game-controller';
 import EndGame from './modules/end-game-module/end-game-controller';
 import MainGame from './modules/main-game-module/main-game-controller';
 import MapView from './modules/main-game-module/map/map-view';
+// @ts-ignore
+import PixiFps from "pixi-fps";
+
+const fpsCounter = new PixiFps();
 
 export class Application extends PIXI.Application {
     protected size: Array<number> = [1024, 768];
@@ -35,11 +39,14 @@ export class Application extends PIXI.Application {
     }
 
     public init() {
+
         this.stateMachine = new StateMachine();
         this.loader = new Loader();
         this.startGameModule = new StartGame();
         this.mainGameModule = new MainGame();
         this.endGameModule = new EndGame();
+        this.stage.addChild(fpsCounter);
+
     }
 
     protected onResize() {

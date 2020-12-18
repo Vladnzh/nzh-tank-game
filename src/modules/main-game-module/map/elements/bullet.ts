@@ -2,16 +2,21 @@ import * as PIXI from 'pixi.js';
 import { app } from '../../../../index';
 import { AnimationsNames, DIRECTION_NAMES, ElementTypeNames } from '../../../constants';
 import { AnimatedSprite } from 'pixi.js';
+import { TypeItemsCollision } from '../../../../interfaces';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class Bullet {
+    public id: string;
     protected ticker: PIXI.Ticker;
     protected speed: number = 3;
     private OFFSET: number = 23;
     protected type: string;
-    protected currentDirection: string;
+    public currentDirection: string;
     public bulletSprite: PIXI.Sprite;
+    public possibleCollision: Array<TypeItemsCollision>;
 
     constructor(direction: string, x: number, y: number) {
+        this.id = uuidv4();
         const texture = app.loader.getTextureByTypeName(ElementTypeNames.BULLET);
         this.bulletSprite = new PIXI.Sprite(texture);
         this.currentDirection = direction;
@@ -22,11 +27,14 @@ export default class Bullet {
         this.ticker.start();
         app.mapView.addChild(this.bulletSprite);
         app.mainGameModule.collisionLogic.addBullet(this);
+        this.updatePossibleCollision();
+        console.log(this.possibleCollision);
     }
 
-    public stop(): void {
-        this.ticker.stop();
+    public updatePossibleCollision() {
+        this.possibleCollision = app.mainGameModule.collisionLogic.findBulletPossibleCollision(this);
     }
+
 
     protected setPosition(x: number, y: number) {
         switch (this.currentDirection) {
@@ -66,8 +74,31 @@ export default class Bullet {
         };
     }
 
+    private itemsIntersect(a: any, b: any): boolean {
+        if (!a || !b) {
+            return false;
+        }
+        if (a.type === b.type) {
+            return false;
+        }
+        const ab = a.getBounds();
+        const bb = b.getBounds();
+        return ab.x + ab.width > bb.x && ab.x < bb.x + bb.width && ab.y + ab.height > bb.y && ab.y < bb.y + bb.height;
+    }
+
+    public remove(collisionItem: TypeItemsCollision): void {
+        this.playAnimation();
+        app.mainGameModule.collisionLogic.removeItem(collisionItem);
+        app.mainGameModule.collisionLogic.removeBullet(this);
+        this.ticker.stop();
+    }
+
     public update(): void {
-        app.mainGameModule.collisionLogic.findBulletCollision(this);
+        const collisionItem = this.possibleCollision.find((item: TypeItemsCollision) =>
+            this.itemsIntersect(this.bulletSprite, item));
+        if (collisionItem) {
+            this.remove(collisionItem);
+        }
         switch (this.currentDirection) {
             case DIRECTION_NAMES.UP : {
                 this.bulletSprite.y -= this.speed;

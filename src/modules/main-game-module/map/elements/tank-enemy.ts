@@ -9,6 +9,7 @@ import { AnimatedSprite } from 'pixi.js';
 
 export default class TankEnemy extends PIXI.Container {
     public type: string;
+    public id: string;
     private RECHARGE_MARK_OFFSET: number = 3.5;
     protected ticker: PIXI.Ticker;
     protected speed: number = 1;
