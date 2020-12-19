@@ -114,7 +114,6 @@ export default class Tank extends PIXI.Container {
 
     public updatePossibleCollision() {
         this.possibleCollision = app.mainGameModule.collisionLogic.findTankPossibleCollision(this);
-        console.log(this.possibleCollision);
     }
 
     protected onCollisionHappened(collisionBoard: TypeItemsCollision): void {

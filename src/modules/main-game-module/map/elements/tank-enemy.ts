@@ -6,6 +6,10 @@ import Board from './board';
 import { TimelineLite } from 'gsap';
 import Tank from './tank';
 import { AnimatedSprite } from 'pixi.js';
+import { TypeItemsCollision } from '../../../../interfaces';
+import { itemsIntersect } from '../../../../utils';
+import { TweenMax } from 'gsap';
+import _ from 'lodash';
 
 export default class TankEnemy extends PIXI.Container {
     public type: string;
@@ -14,11 +18,12 @@ export default class TankEnemy extends PIXI.Container {
     protected ticker: PIXI.Ticker;
     protected speed: number = 1;
     protected bullet: Bullet;
-    protected currentDirection: string;
+    public currentDirection: string;
     protected rechargeMark: PIXI.Graphics;
     protected inMove: boolean;
     protected isDrown: boolean = false;
     public tankSprite: PIXI.Sprite;
+    public possibleCollision: Array<TypeItemsCollision>;
 
     constructor(texture: PIXI.Texture, type: string, i: number, j: number) {
         super();
@@ -37,8 +42,20 @@ export default class TankEnemy extends PIXI.Container {
         this.ticker.start();
         this.addChild(this.tankSprite);
         app.mainGameModule.collisionLogic.addEnemyTank(this);
+        this.loop();
+
     }
 
+    protected loop(): void {
+        const directions: Array<string> = [DIRECTION_NAMES.LEFT, DIRECTION_NAMES.RIGHT, DIRECTION_NAMES.DOWN, DIRECTION_NAMES.UP];
+        this.bullet = new Bullet(this.currentDirection, this.tankSprite.x, this.tankSprite.y);
+        this.setDirection(directions[_.random(0, directions.length)]);
+        TweenMax.delayedCall(1, () => this.loop());
+    }
+
+    public updatePossibleCollision(): void {
+        this.possibleCollision = app.mainGameModule.collisionLogic.findTankPossibleCollision(this);
+    }
 
     public update(): void {
         if (this.isDrown) {
@@ -82,18 +99,20 @@ export default class TankEnemy extends PIXI.Container {
                 break;
             }
         }
-        const collisionBoard: Board | Tank | TankEnemy = app.mainGameModule.collisionLogic.findTankCollision(this);
         this.setSpeed(1);
-        if (collisionBoard) {
-            this.onCollisionHappened(collisionBoard);
+        const collisionItem = this.possibleCollision?.find((item: TypeItemsCollision) =>
+            itemsIntersect(this, item));
+        if (collisionItem) {
+            this.onCollisionHappened(collisionItem);
         }
     }
 
     protected onCollisionHappened(collisionBoard: Board | Tank | TankEnemy): void {
-        if (collisionBoard.type === ElementTypeNames.WATER) {
-            this.onDrown(collisionBoard);
-            return;
-        }
+        // if (collisionBoard.type === ElementTypeNames.WATER) {
+        //     this.onDrown(collisionBoard);
+        //     return;
+        // }
+
         if (collisionBoard.type === ElementTypeNames.LEAVES) {
             this.setSpeed(this.speed / 2);
             return;
@@ -156,5 +175,10 @@ export default class TankEnemy extends PIXI.Container {
         };
     }
 
+    public setDirection(direction: string): void {
+        this.inMove = true;
+        this.currentDirection = direction;
+        this.updatePossibleCollision()
+    }
 }
 

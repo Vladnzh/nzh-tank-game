@@ -29,7 +29,7 @@ export default class CollisionLogic {
 
     public addEnemyTank(tank: Tank | TankEnemy) {
         // this.tanks.push(tank);
-        this.itemsCollision.push(tank);
+        // this.itemsCollision.push(tank);
     }
 
     public addBullet(bullet: Bullet) {
@@ -52,39 +52,73 @@ export default class CollisionLogic {
     }
 
     public findBulletPossibleCollision(bullet: Bullet) {
-        this.addBullet(bullet);
-        if (bullet.currentDirection === DIRECTION_NAMES.LEFT) {
-            const collision: any = this.itemsCollision.filter((item) => {
-                return item.x < bullet.bulletSprite.x
-                    && item.y + item.height + 10 > bullet.bulletSprite.y
-                    && item.y < bullet.bulletSprite.y + bullet.bulletSprite.height + 10
-                    && item.type !== ElementTypeNames.LEAVES
-                    && item.type !== ElementTypeNames.WATER;
-            });
-            return collision;
-        }
+        const collision: any = this.itemsCollision.filter((item, index: number) => {
+            if(index < 1){
+                return   false
+            }
+            switch (bullet.currentDirection) {
+                case DIRECTION_NAMES.UP : {
+                    return item.y < bullet.bulletSprite.y
+                        && item.x + item.width + 10 > bullet.bulletSprite.x
+                        && item.x < bullet.bulletSprite.x + bullet.bulletSprite.width + 10
+                        && item.type !== ElementTypeNames.LEAVES
+                        && item.type !== ElementTypeNames.WATER
+                }
+                case DIRECTION_NAMES.LEFT : {
+                    return item.x < bullet.bulletSprite.x
+                        && item.y + item.height + 10 > bullet.bulletSprite.y
+                        && item.y < bullet.bulletSprite.y + bullet.bulletSprite.height + 10
+                        && item.type !== ElementTypeNames.LEAVES
+                        && item.type !== ElementTypeNames.WATER
+                }
+                case DIRECTION_NAMES.DOWN : {
+                    return item.y > bullet.bulletSprite.y
+                        && item.x + item.width + 10 > bullet.bulletSprite.x
+                        && item.x < bullet.bulletSprite.x + bullet.bulletSprite.width + 10
+                        && item.type !== ElementTypeNames.LEAVES
+                        && item.type !== ElementTypeNames.WATER
+                }
+                case DIRECTION_NAMES.RIGHT : {
+                    return item.x > bullet.bulletSprite.x
+                        && item.y + item.height + 10 > bullet.bulletSprite.y
+                        && item.y < bullet.bulletSprite.y + bullet.bulletSprite.height + 10
+                        && item.type !== ElementTypeNames.LEAVES
+                        && item.type !== ElementTypeNames.WATER
+                }
+            }
+        });
+        // collision.map((item: any) => app.mapView.removeChild(item));
+        return collision;
     }
+    // collision.map((item: any) => app.mapView.removeChild(item));
 
-    public findTankPossibleCollision(tank: Tank) {
-        this.addTank(tank);
-        if (tank.currentDirection === DIRECTION_NAMES.LEFT) {
-            const collision: any = this.itemsCollision.filter((item: Board) => {
-                return item.x < tank.tankSprite.x - (tank.tankSprite.width)
-                    && item.y + item.height > tank.tankSprite.y
-                    && item.y < tank.tankSprite.y + tank.tankSprite.width
-                    && item.type !== ElementTypeNames.LEAVES
-                    && item.type !== ElementTypeNames.WATER;
-            });
-            // console.log('this.itemsCollision', this.itemsCollision);
-            // collision.map((item: Board) => app.mapView.removeChild(item));
-            return collision;
-        }
+    public findTankPossibleCollision(tank: Tank | TankEnemy) {
+        const collision: any = this.itemsCollision.filter((item) => {
+            switch (tank.currentDirection) {
+                case DIRECTION_NAMES.UP : {
+                    return item.y < tank.tankSprite.y - tank.tankSprite.height
+                        && item.x + item.width > tank.tankSprite.x
+                        && item.x < tank.tankSprite.x + tank.tankSprite.width;
+                }
+                case DIRECTION_NAMES.LEFT : {
+                    return item.x < tank.tankSprite.x - tank.tankSprite.width
+                        && item.y + item.height > tank.tankSprite.y
+                        && item.y < tank.tankSprite.y + tank.tankSprite.width;
+                }
+                case DIRECTION_NAMES.DOWN : {
+                    return item.y > tank.tankSprite.y - tank.tankSprite.height
+                        && item.x + item.width > tank.tankSprite.x
+                        && item.x < tank.tankSprite.x + tank.tankSprite.width;
+                }
+                case DIRECTION_NAMES.RIGHT : {
+                    return item.x > tank.tankSprite.x - tank.tankSprite.width
+                        && item.y + item.height > tank.tankSprite.y
+                        && item.y < tank.tankSprite.y + tank.tankSprite.width;
+                }
+            }
+        });
+        return collision;
+
     }
-
-    public findTankCollision(tank: Tank | TankEnemy): TypeItemsCollision {
-        return this.itemsCollision.find((item: TypeItemsCollision) =>
-            itemsIntersect(tank, item));
-    }
-
 
 }
