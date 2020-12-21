@@ -1,27 +1,26 @@
 import MapView from './map-view';
 import { TweenMax } from 'gsap';
 import { app } from '../../../index';
-import PIXI from 'pixi.js';
-import { mapMatrix } from '../../../utils';
+import PIXI, { Point } from 'pixi.js';
+import { mapMatrix, textureBonusNames, textureTankNames } from '../../../utils';
 import Board from './elements/board';
 import Tank from './elements/tank';
-import { ElementTypeNames } from '../../constants';
+import { DefaultTextureSize, ElementTypeNames } from '../../constants';
 import TankEnemy from './elements/tank-enemy';
 import Bonus from './elements/bonus';
+import _ from 'lodash';
 
 export default class MapController {
+    protected emptySpaces: Array<PIXI.Point> = [];
+    protected textureTankNames: Array<string>;
     public view: MapView;
 
     constructor() {
-        this.init();
+        this.view = new MapView();
     }
 
     public getView(): MapView {
         return this.view;
-    }
-
-    public init(): void {
-        this.view = new MapView();
     }
 
     public drawView(): void {
@@ -47,22 +46,36 @@ export default class MapController {
     }
 
     protected createMap(): void {
+        this.textureTankNames = _.cloneDeep(textureTankNames);
         for (let i = 0; i < mapMatrix.length; i++) {
             for (let j = 0; j < mapMatrix[i].length; j++) {
                 if (mapMatrix[i][j]) {
                     let index = mapMatrix[i][j];
                     if (index === 2) {
-                        this.addBoardFromSmallBoard(i, j);
+                        this.createBoardFromSmallBoard(i, j);
+                    } else if (index === 0) {
+
                     } else {
-                        this.addBoardByIndex(index, i, j);
+                        this.createTextureByIndex(index, i, j);
                     }
+                } else {
+                    const point = new Point(DefaultTextureSize.WIDTH * j, DefaultTextureSize.HEIGHT * i);
+                    this.emptySpaces.push(point);
                 }
             }
         }
-        this.view.sortChildren()
+        this.view.sortChildren();
+        this.bonusGenerationLoop();
     };
 
-    protected addBoardByIndex(index: number, i: number, j: number) {
+    protected bonusGenerationLoop(): void {
+        if (!app.mainGameModule.collisionLogic.currentBonusOnMap) {
+            this.createBonus(this.emptySpaces[_.random(0, this.emptySpaces.length - 1)]);
+        }
+        TweenMax.delayedCall(_.random(5, 8), () => this.bonusGenerationLoop());
+    }
+
+    protected createTextureByIndex(index: number, i: number, j: number) {
         let sprite: PIXI.Container;
         let texture: PIXI.Texture;
 
@@ -75,7 +88,7 @@ export default class MapController {
             case 3: {
                 texture = app.loader.getTextureByTypeName(ElementTypeNames.LEAVES);
                 sprite = new Board(texture, ElementTypeNames.LEAVES, i, j);
-                sprite.zIndex = 1
+                sprite.zIndex = 1;
                 break;
             }
             case 4: {
@@ -90,8 +103,15 @@ export default class MapController {
                 break;
             }
             case 6: {
-                texture = app.loader.getTextureByTypeName(ElementTypeNames.TANK_ENEMY_RED);
-                sprite = new TankEnemy(texture, ElementTypeNames.TANK_ENEMY_RED, i, j);
+                let textureName: string;
+                if (_.isEmpty(this.textureTankNames)) {
+                    this.textureTankNames = _.cloneDeep(textureTankNames);
+                    textureName = this.textureTankNames.shift();
+                } else {
+                    textureName = this.textureTankNames.shift();
+                }
+                texture = app.loader.getTextureByTypeName(textureName);
+                sprite = new TankEnemy(texture, textureName, i, j);
                 break;
             }
             case 7: {
@@ -99,35 +119,26 @@ export default class MapController {
                 sprite = new Board(texture, ElementTypeNames.EAGLE, i, j);
                 break;
             }
-            case 8: {
-                texture = app.loader.getTextureByTypeName(ElementTypeNames.BONUS_SPEED);
-                sprite = new Bonus(texture, ElementTypeNames.BONUS_SPEED, i, j);
-                break;
-            }
-            case 9: {
-                texture = app.loader.getTextureByTypeName(ElementTypeNames.BONUS_LIVE);
-                sprite = new Bonus(texture, ElementTypeNames.BONUS_LIVE, i, j);
-                break;
-            }
-            case 10: {
-                texture = app.loader.getTextureByTypeName(ElementTypeNames.BONUS_IMMORTAL);
-                sprite = new Bonus(texture, ElementTypeNames.BONUS_IMMORTAL, i, j);
-                break;
-            }
-            case 11: {
-                texture = app.loader.getTextureByTypeName(ElementTypeNames.BONUS_SLOW);
-                sprite = new Bonus(texture, ElementTypeNames.BONUS_SLOW, i, j);
-                break;
-            }
         }
-        this.view.addChild(sprite);
+        if (sprite) {
+            this.view.addChild(sprite);
+        }
     };
 
-    protected addBoardFromSmallBoard(i: number, j: number) {
+    protected createBonus(point: PIXI.Point): void {
+        if (point) {
+            const textureTypeName = textureBonusNames[_.random(0, textureBonusNames.length - 1)];
+            let texture = app.loader.getTextureByTypeName(textureTypeName);
+            let sprite = new Bonus(texture, textureTypeName, point.x, point.y);
+            this.view.addChild(sprite);
+        }
+    }
+
+    protected createBoardFromSmallBoard(i: number, j: number) {
         let board: Board;
         for (let k = 0; k <= 3; k++) {
-            const texture = app.loader.getTextureByTypeName(ElementTypeNames.SMALL_WALL_1);
-            board = new Board(texture, ElementTypeNames.SMALL_WALL_1, i, j);
+            const texture = app.loader.getTextureByTypeName(ElementTypeNames.SMALL_WALL);
+            board = new Board(texture, ElementTypeNames.SMALL_WALL, i, j);
             switch (k) {
                 case 0: {
                     board.x = board.width * 2 * j;

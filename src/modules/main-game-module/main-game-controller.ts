@@ -15,7 +15,7 @@ export default class MainGameController {
     }
 
     public drawView(): void {
-        this.map.drawView();
+        this.map.showView();
         const mapView = this.map.getView();
         this.view.addChild(mapView);
     }

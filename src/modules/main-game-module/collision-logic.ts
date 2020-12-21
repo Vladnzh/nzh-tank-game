@@ -6,30 +6,35 @@ import { app } from '../../index';
 import { DIRECTION_NAMES, ElementTypeNames } from '../constants';
 import TankEnemy from './map/elements/tank-enemy';
 import { TypeItemsCollision } from '../../interfaces';
-import { itemsIntersect } from '../../utils';
+import Bonus from './map/elements/bonus';
 
 export default class CollisionLogic {
-    protected ignoreCollisionForBullet: Array<string> = [ElementTypeNames.LEAVES, ElementTypeNames.WATER];
-    protected boards: Array<Board> = [];
+    protected OFFSET_TANK_POSSIBLE_COLLISION: number = 15;
+    protected OFFSET_BULLET_POSSIBLE_COLLISION: number = 10;
+    public currentBonusOnMap: Bonus;
     protected itemsCollision: Array<TypeItemsCollision> = [];
-    protected tanks: Array<Tank | TankEnemy> = [];
     protected bullets: Array<Bullet> = [];
 
-    constructor() {
-    }
-
     public addBoard(board: Board) {
-        // this.boards.push(board);
         this.itemsCollision.push(board);
     }
 
     public addTank(tank: Tank | TankEnemy) {
-        // this.tanks.push(tank);
+        this.itemsCollision.push(tank);
     }
 
     public addEnemyTank(tank: Tank | TankEnemy) {
-        // this.tanks.push(tank);
-        // this.itemsCollision.push(tank);
+        this.itemsCollision.push(tank);
+    }
+
+    public addBonus(bonus: Bonus) {
+        this.currentBonusOnMap = bonus;
+        this.itemsCollision.push(bonus);
+    }
+
+    public removeBonus(bonus: Bonus) {
+        this.currentBonusOnMap = null;
+        this.removeItem(bonus);
     }
 
     public addBullet(bullet: Bullet) {
@@ -46,79 +51,105 @@ export default class CollisionLogic {
         if (collisionItem.type === ElementTypeNames.WALL) {
             return;
         }
-        _.remove(this.itemsCollision, (item: TypeItemsCollision) => item?.id === collisionItem?.id);
         app.mapView.removeChild(collisionItem);
+        _.remove(this.itemsCollision, (item: TypeItemsCollision) => item?.id === collisionItem?.id);
 
     }
 
     public findBulletPossibleCollision(bullet: Bullet) {
-        const collision: any = this.itemsCollision.filter((item, index: number) => {
-            if(index < 1){
-                return   false
+        const collision: any = this.itemsCollision.filter((item: TypeItemsCollision, index: number) => {
+            if (index < 1) {
+                return false;
+            }
+            let x = item.x;
+            let y = item.y;
+            if (item.type === ElementTypeNames.TANK
+                || item.type === ElementTypeNames.TANK_ENEMY_RED
+                || item.type === ElementTypeNames.TANK_ENEMY_BLUE
+                || item.type === ElementTypeNames.TANK_ENEMY_WHITE
+            ) {
+                x = (item as Tank).tankSprite.x;
+                y = (item as Tank).tankSprite.y;
             }
             switch (bullet.currentDirection) {
                 case DIRECTION_NAMES.UP : {
-                    return item.y < bullet.bulletSprite.y
-                        && item.x + item.width + 10 > bullet.bulletSprite.x
-                        && item.x < bullet.bulletSprite.x + bullet.bulletSprite.width + 10
+                    return y < bullet.bulletSprite.y
+                        && x + item.width + this.OFFSET_BULLET_POSSIBLE_COLLISION > bullet.bulletSprite.x
+                        && x < bullet.bulletSprite.x + bullet.bulletSprite.width + this.OFFSET_BULLET_POSSIBLE_COLLISION
                         && item.type !== ElementTypeNames.LEAVES
                         && item.type !== ElementTypeNames.WATER
+                        && item.type !== ElementTypeNames.BONUS_SPEED
+                        && item.type !== ElementTypeNames.BONUS_IMMORTAL
+                        && item.type !== ElementTypeNames.BONUS_LIVE
+                        && item.type !== ElementTypeNames.BONUS_SLOW;
                 }
                 case DIRECTION_NAMES.LEFT : {
-                    return item.x < bullet.bulletSprite.x
-                        && item.y + item.height + 10 > bullet.bulletSprite.y
-                        && item.y < bullet.bulletSprite.y + bullet.bulletSprite.height + 10
+                    return x < bullet.bulletSprite.x
+                        && y + item.height + this.OFFSET_BULLET_POSSIBLE_COLLISION > bullet.bulletSprite.y
+                        && y < bullet.bulletSprite.y + bullet.bulletSprite.height + this.OFFSET_BULLET_POSSIBLE_COLLISION
                         && item.type !== ElementTypeNames.LEAVES
                         && item.type !== ElementTypeNames.WATER
+                        && item.type !== ElementTypeNames.BONUS_SPEED
+                        && item.type !== ElementTypeNames.BONUS_IMMORTAL
+                        && item.type !== ElementTypeNames.BONUS_LIVE
+                        && item.type !== ElementTypeNames.BONUS_SLOW;
                 }
                 case DIRECTION_NAMES.DOWN : {
-                    return item.y > bullet.bulletSprite.y
-                        && item.x + item.width + 10 > bullet.bulletSprite.x
-                        && item.x < bullet.bulletSprite.x + bullet.bulletSprite.width + 10
+                    return y > bullet.bulletSprite.y
+                        && x + item.width + this.OFFSET_BULLET_POSSIBLE_COLLISION > bullet.bulletSprite.x
+                        && x < bullet.bulletSprite.x + bullet.bulletSprite.width + this.OFFSET_BULLET_POSSIBLE_COLLISION
                         && item.type !== ElementTypeNames.LEAVES
                         && item.type !== ElementTypeNames.WATER
+                        && item.type !== ElementTypeNames.BONUS_SPEED
+                        && item.type !== ElementTypeNames.BONUS_IMMORTAL
+                        && item.type !== ElementTypeNames.BONUS_LIVE
+                        && item.type !== ElementTypeNames.BONUS_SLOW;
                 }
                 case DIRECTION_NAMES.RIGHT : {
-                    return item.x > bullet.bulletSprite.x
-                        && item.y + item.height + 10 > bullet.bulletSprite.y
-                        && item.y < bullet.bulletSprite.y + bullet.bulletSprite.height + 10
+                    return x > bullet.bulletSprite.x
+                        && y + item.height + this.OFFSET_BULLET_POSSIBLE_COLLISION > bullet.bulletSprite.y
+                        && y < bullet.bulletSprite.y + bullet.bulletSprite.height + this.OFFSET_BULLET_POSSIBLE_COLLISION
                         && item.type !== ElementTypeNames.LEAVES
                         && item.type !== ElementTypeNames.WATER
+                        && item.type !== ElementTypeNames.BONUS_SPEED
+                        && item.type !== ElementTypeNames.BONUS_IMMORTAL
+                        && item.type !== ElementTypeNames.BONUS_LIVE
+                        && item.type !== ElementTypeNames.BONUS_SLOW;
                 }
             }
         });
-        // collision.map((item: any) => app.mapView.removeChild(item));
         return collision;
     }
-    // collision.map((item: any) => app.mapView.removeChild(item));
 
     public findTankPossibleCollision(tank: Tank | TankEnemy) {
         const collision: any = this.itemsCollision.filter((item) => {
             switch (tank.currentDirection) {
                 case DIRECTION_NAMES.UP : {
                     return item.y < tank.tankSprite.y - tank.tankSprite.height
-                        && item.x + item.width > tank.tankSprite.x
-                        && item.x < tank.tankSprite.x + tank.tankSprite.width;
+                        && item.x + item.width + this.OFFSET_TANK_POSSIBLE_COLLISION > tank.tankSprite.x
+                        && item.x < tank.tankSprite.x + tank.tankSprite.width + this.OFFSET_TANK_POSSIBLE_COLLISION
+                        && item.type !== ElementTypeNames.LEAVES;
                 }
                 case DIRECTION_NAMES.LEFT : {
                     return item.x < tank.tankSprite.x - tank.tankSprite.width
-                        && item.y + item.height > tank.tankSprite.y
-                        && item.y < tank.tankSprite.y + tank.tankSprite.width;
+                        && item.y + item.height + this.OFFSET_TANK_POSSIBLE_COLLISION > tank.tankSprite.y
+                        && item.y < tank.tankSprite.y + tank.tankSprite.width + this.OFFSET_TANK_POSSIBLE_COLLISION
+                        && item.type !== ElementTypeNames.LEAVES;
                 }
                 case DIRECTION_NAMES.DOWN : {
                     return item.y > tank.tankSprite.y - tank.tankSprite.height
-                        && item.x + item.width > tank.tankSprite.x
-                        && item.x < tank.tankSprite.x + tank.tankSprite.width;
+                        && item.x + item.width + this.OFFSET_TANK_POSSIBLE_COLLISION > tank.tankSprite.x
+                        && item.x < tank.tankSprite.x + tank.tankSprite.width
+                        && item.type !== ElementTypeNames.LEAVES;
                 }
                 case DIRECTION_NAMES.RIGHT : {
                     return item.x > tank.tankSprite.x - tank.tankSprite.width
-                        && item.y + item.height > tank.tankSprite.y
-                        && item.y < tank.tankSprite.y + tank.tankSprite.width;
+                        && item.y + item.height + this.OFFSET_TANK_POSSIBLE_COLLISION > tank.tankSprite.y
+                        && item.y < tank.tankSprite.y + tank.tankSprite.width + this.OFFSET_TANK_POSSIBLE_COLLISION
+                        && item.type !== ElementTypeNames.LEAVES;
                 }
             }
         });
         return collision;
-
     }
-
 }

@@ -1,14 +1,20 @@
 import * as PIXI from 'pixi.js';
-import { DefaultTextureSize } from '../../../constants';
+import { app } from '../../../../index';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class Bonus extends PIXI.Sprite {
+    public id: string;
     public type: string;
 
-    constructor(texture: PIXI.Texture, type: string, i: number, j: number) {
+    constructor(texture: PIXI.Texture, type: string, x: number, y: number) {
         super(texture);
-        this.x = DefaultTextureSize.WIDTH * j + 2;
-        this.y = DefaultTextureSize.HEIGHT * i + 2;
+        this.id = uuidv4();
+        this.x = x;
+        this.y = y;
         this.type = type;
-        // app.collisionLogic.addBoard(this)
+        app.mainGameModule.collisionLogic.addBonus(this);
+    }
+    public remove(){
+        app.mainGameModule.collisionLogic.removeBonus(this);
     }
 }

@@ -32,10 +32,7 @@ export default class LoaderController extends PIXI.Loader {
 
         this.add(ElementTypeNames.EAGLE, 'board/eagle.png')
             .add(ElementTypeNames.LEAVES, 'board/leaves.png')
-            .add(ElementTypeNames.SMALL_WALL_1, 'board/small_wall_1.png')
-            .add(ElementTypeNames.SMALL_WALL_2, 'board/small_wall_2.png')
-            .add(ElementTypeNames.SMALL_WALL_3, 'board/small_wall_3.png')
-            .add(ElementTypeNames.SMALL_WALL_4, 'board/small_wall_4.png')
+            .add(ElementTypeNames.SMALL_WALL, 'board/small_wall_1.png')
             .add(ElementTypeNames.WALL, 'board/wall.png')
             .add(ElementTypeNames.WATER, 'board/water.png')
             .add(ElementTypeNames.BONUS_IMMORTAL, 'bonus/bonus_immortal.png')
@@ -48,6 +45,7 @@ export default class LoaderController extends PIXI.Loader {
             .add(ElementTypeNames.TANK_ENEMY_WHITE, 'tanks/enemy_white.png')
             .add(ElementTypeNames.START_BUTTON, 'button.png')
             .add(ElementTypeNames.BULLET, 'bullet.png')
+            .add(ElementTypeNames.BULLET_ENEMY, 'enemy_bullet.png')
             .add(AnimationsNames.ANIMATIONS, 'animations.json')
             .load();
 

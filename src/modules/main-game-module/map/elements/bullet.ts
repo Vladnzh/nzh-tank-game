@@ -4,20 +4,25 @@ import { AnimationsNames, DIRECTION_NAMES, ElementTypeNames } from '../../../con
 import { AnimatedSprite } from 'pixi.js';
 import { TypeItemsCollision } from '../../../../interfaces';
 import { v4 as uuidv4 } from 'uuid';
+import _ from 'lodash';
+import TankEnemy from './tank-enemy';
+import Tank from './tank';
+import { StateNames } from '../../../../state-machine/state-machine-constants';
 
 export default class Bullet {
     public id: string;
     protected ticker: PIXI.Ticker;
-    protected speed: number = 3;
-    private OFFSET: number = 23;
+    protected speed: number = 5;
+    private OFFSET: number = 15;
     protected type: string;
     public currentDirection: string;
     public bulletSprite: PIXI.Sprite;
     public possibleCollision: Array<TypeItemsCollision>;
 
-    constructor(direction: string, x: number, y: number) {
+    constructor(textureTypeName: string, direction: string, x: number, y: number) {
         this.id = uuidv4();
-        const texture = app.loader.getTextureByTypeName(ElementTypeNames.BULLET);
+        this.type = textureTypeName;
+        const texture = app.loader.getTextureByTypeName(textureTypeName);
         this.bulletSprite = new PIXI.Sprite(texture);
         this.currentDirection = direction;
         this.setPosition(x, y);
@@ -28,7 +33,6 @@ export default class Bullet {
         app.mapView.addChild(this.bulletSprite);
         app.mainGameModule.collisionLogic.addBullet(this);
         this.updatePossibleCollision();
-        console.log(this.possibleCollision);
     }
 
     public updatePossibleCollision() {
@@ -86,19 +90,41 @@ export default class Bullet {
         return ab.x + ab.width > bb.x && ab.x < bb.x + bb.width && ab.y + ab.height > bb.y && ab.y < bb.y + bb.height;
     }
 
-    public remove(collisionItem: TypeItemsCollision): void {
+    public onExplode(): void {
         this.playAnimation();
-        app.mainGameModule.collisionLogic.removeItem(collisionItem);
         app.mainGameModule.collisionLogic.removeBullet(this);
         this.ticker.stop();
     }
 
+    protected onCollisionHappened(collisionItem: TypeItemsCollision): void {
+        if ((collisionItem.type === ElementTypeNames.TANK_ENEMY_RED
+            || collisionItem.type === ElementTypeNames.TANK_ENEMY_BLUE
+            || collisionItem.type === ElementTypeNames.TANK_ENEMY_WHITE)
+            && this.type !== ElementTypeNames.BULLET_ENEMY) {
+            (collisionItem as TankEnemy).onExplode();
+        }
+        if (collisionItem.type === ElementTypeNames.TANK) {
+            (collisionItem as Tank).onExplode();
+        }
+        if (collisionItem.type === ElementTypeNames.SMALL_WALL) {
+            app.mainGameModule.collisionLogic.removeItem(collisionItem);
+        }
+        if (collisionItem.type === ElementTypeNames.EAGLE) {
+            app.mainGameModule.collisionLogic.removeItem(collisionItem);
+            app.stateMachine.changeState(StateNames.END_GAME_STATE);
+        }
+        this.onExplode();
+    }
+
     public update(): void {
+        _.throttle(() => this.updatePossibleCollision(), 100);
         const collisionItem = this.possibleCollision.find((item: TypeItemsCollision) =>
             this.itemsIntersect(this.bulletSprite, item));
+
         if (collisionItem) {
-            this.remove(collisionItem);
+            this.onCollisionHappened(collisionItem);
         }
+
         switch (this.currentDirection) {
             case DIRECTION_NAMES.UP : {
                 this.bulletSprite.y -= this.speed;

@@ -19,10 +19,7 @@ export class ElementTypeNames {
     static readonly EAGLE = 'eagle';
     static readonly LEAVES = 'leaves';
     static readonly WALL = 'wall';
-    static readonly SMALL_WALL_1 = 'smallWall1';
-    static readonly SMALL_WALL_2 = 'smallWall2';
-    static readonly SMALL_WALL_3 = 'smallWall3';
-    static readonly SMALL_WALL_4 = 'smallWall4';
+    static readonly SMALL_WALL = 'smallWall';
     static readonly WATER = 'water';
     static readonly BONUS_IMMORTAL = 'bonusImmortal';
     static readonly BONUS_LIVE = 'bonusLive';
@@ -34,6 +31,7 @@ export class ElementTypeNames {
     static readonly TANK_ENEMY_WHITE = 'enemyWhite';
     static readonly START_BUTTON = 'startButton';
     static readonly BULLET = 'bullet';
+    static readonly BULLET_ENEMY = 'bulletEnemy';
 }
 
 export class AnimationsNames {
