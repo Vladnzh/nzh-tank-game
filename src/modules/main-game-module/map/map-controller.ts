@@ -127,7 +127,8 @@ export default class MapController {
 
     protected createBonus(point: PIXI.Point): void {
         if (point) {
-            const textureTypeName = textureBonusNames[_.random(0, textureBonusNames.length - 1)];
+            const textureTypeName = textureBonusNames[2];
+            // const textureTypeName = textureBonusNames[_.random(0, textureBonusNames.length - 1)];
             let texture = app.loader.getTextureByTypeName(textureTypeName);
             let sprite = new Bonus(texture, textureTypeName, point.x, point.y);
             this.view.addChild(sprite);

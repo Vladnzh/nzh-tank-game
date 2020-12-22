@@ -1,18 +1,21 @@
 export class StartGameNames {
     static readonly TITLE = 'THE TANKS';
 }
+
 export class EVENT_NAMES {
     static readonly MOUSEDOWN = 'mousedown';
     static readonly MOUSEUP = 'mouseup';
     static readonly KEYDOWN = 'keydown';
     static readonly KEYUP = 'keyup';
 }
+
 export class DIRECTION_NAMES {
     static readonly DOWN = 'DOWN';
     static readonly UP = 'UP';
     static readonly LEFT = 'LEFT';
     static readonly RIGHT = 'RIGHT';
 }
+
 export class ElementTypeNames {
     static readonly LOADER_BAR = 'loaderBar';
     static readonly LOADER_BG = 'loaderBg';
@@ -40,6 +43,7 @@ export class AnimationsNames {
     static readonly EXPLODE_SPRITE = 'explode';
     static readonly EXPLODE_SMALL_SPRITE = 'explode_small';
 }
+
 export class DefaultTextureSize {
     static readonly WIDTH = 36;
     static readonly HEIGHT = 36;
@@ -47,4 +51,13 @@ export class DefaultTextureSize {
 
 export class LoaderNames {
     static readonly TITLE = 'Loading...';
+}
+
+export class DefaultParams {
+    static readonly TANK_SPEED: number = 1;
+    static readonly BULLET_SPEED: number = 5;
+    static readonly BONUS_EXPIRATION_TIME: number = 4;
+    static readonly BONUS_IMMORTAL_EXPIRATION_TIME: number = 2;
+    static readonly RECHARGE_TIME: number = 1.5;
+    static readonly AMOUNT_LIFE: number = 0;
 }

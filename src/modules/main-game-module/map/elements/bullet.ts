@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { app } from '../../../../index';
-import { AnimationsNames, DIRECTION_NAMES, ElementTypeNames } from '../../../constants';
+import { AnimationsNames, DefaultParams, DIRECTION_NAMES, ElementTypeNames } from '../../../constants';
 import { AnimatedSprite } from 'pixi.js';
 import { TypeItemsCollision } from '../../../../interfaces';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,7 +12,7 @@ import { StateNames } from '../../../../state-machine/state-machine-constants';
 export default class Bullet {
     public id: string;
     protected ticker: PIXI.Ticker;
-    protected speed: number = 5;
+    protected speed: number;
     private OFFSET: number = 15;
     protected type: string;
     public currentDirection: string;
@@ -22,6 +22,7 @@ export default class Bullet {
     constructor(textureTypeName: string, direction: string, x: number, y: number) {
         this.id = uuidv4();
         this.type = textureTypeName;
+        this.speed = DefaultParams.BULLET_SPEED
         const texture = app.loader.getTextureByTypeName(textureTypeName);
         this.bulletSprite = new PIXI.Sprite(texture);
         this.currentDirection = direction;

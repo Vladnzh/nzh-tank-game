@@ -4,9 +4,9 @@ import Bullet from './map/elements/bullet';
 import _ from 'lodash';
 import { app } from '../../index';
 import { DIRECTION_NAMES, ElementTypeNames } from '../constants';
-import TankEnemy from './map/elements/tank-enemy';
 import { TypeItemsCollision } from '../../interfaces';
 import Bonus from './map/elements/bonus';
+import { AbstractTank } from './map/elements/abstract-tank';
 
 export default class CollisionLogic {
     protected OFFSET_TANK_POSSIBLE_COLLISION: number = 15;
@@ -19,11 +19,7 @@ export default class CollisionLogic {
         this.itemsCollision.push(board);
     }
 
-    public addTank(tank: Tank | TankEnemy) {
-        this.itemsCollision.push(tank);
-    }
-
-    public addEnemyTank(tank: Tank | TankEnemy) {
+    public addTank(tank: AbstractTank) {
         this.itemsCollision.push(tank);
     }
 
@@ -121,7 +117,7 @@ export default class CollisionLogic {
         return collision;
     }
 
-    public findTankPossibleCollision(tank: Tank | TankEnemy) {
+    public findTankPossibleCollision(tank: AbstractTank) {
         const collision: any = this.itemsCollision.filter((item) => {
             switch (tank.currentDirection) {
                 case DIRECTION_NAMES.UP : {
