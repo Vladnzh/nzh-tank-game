@@ -1,7 +1,7 @@
 import EndGameView from './end-game-view';
 import { IResourceDictionary } from 'pixi.js';
 import { app } from '../../index';
-import { TweenMax } from 'gsap';
+import { TimelineLite, TweenMax } from 'gsap';
 
 export default class EndGameController {
     protected view: EndGameView;
@@ -19,12 +19,17 @@ export default class EndGameController {
         this.drawView();
         this.view.alpha = 0;
         this.view.visible = true;
-        TweenMax.to(this.view, 1, {
+        const tl = new TimelineLite;
+        tl.to(this.view, 1, {
             alpha: 1,
-        });
+        })
+            .add(() => {
+                this.view.interactiveButton(true);
+            });
     }
 
     public hideView(): void {
+        this.view.interactiveButton(false);
         TweenMax.to(this.view, 1, {
             alpha: 0,
             onComplete: () => {

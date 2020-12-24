@@ -1,11 +1,10 @@
-import MapView from './map-view';
 import { TweenMax } from 'gsap';
-import { app } from '../../../index';
-import PIXI, { Point } from 'pixi.js';
-import { mapMatrix, textureBonusNames, textureTankNames } from '../../../utils';
+import { app } from '../../index';
+import PIXI, { Container, Point } from 'pixi.js';
+import { mapMatrix, textureBonusNames, textureTankNames } from '../../utils';
 import Board from './elements/board';
 import Tank from './elements/tank';
-import { DefaultTextureSize, ElementTypeNames } from '../../constants';
+import { DefaultTextureSize, ElementTypeNames } from '../constants';
 import TankEnemy from './elements/tank-enemy';
 import Bonus from './elements/bonus';
 import _ from 'lodash';
@@ -13,39 +12,14 @@ import _ from 'lodash';
 export default class MapController {
     protected emptySpaces: Array<PIXI.Point> = [];
     protected textureTankNames: Array<string>;
-    public view: MapView;
+    public view: Container;
 
-    constructor() {
-        this.view = new MapView();
+    constructor(view: Container) {
+        this.view = view;
     }
 
-    public getView(): MapView {
-        return this.view;
-    }
 
-    public drawView(): void {
-        this.createMap();
-    }
-
-    public showView(): void {
-        this.drawView();
-        this.view.alpha = 0;
-        this.view.visible = true;
-        TweenMax.to(this.view, 1, {
-            alpha: 1,
-        });
-    }
-
-    public hideView(): void {
-        TweenMax.to(this.view, 1, {
-            alpha: 0,
-            onComplete: () => {
-                this.view.visible = false;
-            },
-        });
-    }
-
-    protected createMap(): void {
+    public createMap(): void {
         this.textureTankNames = _.cloneDeep(textureTankNames);
         for (let i = 0; i < mapMatrix.length; i++) {
             for (let j = 0; j < mapMatrix[i].length; j++) {

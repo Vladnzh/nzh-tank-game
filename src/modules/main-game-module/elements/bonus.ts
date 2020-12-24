@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { app } from '../../../../index';
+import { app } from '../../../index';
 import { v4 as uuidv4 } from 'uuid';
 
 export default class Bonus extends PIXI.Sprite {
@@ -16,5 +16,6 @@ export default class Bonus extends PIXI.Sprite {
     }
     public remove(){
         app.mainGameModule.collisionLogic.removeBonus(this);
+        app.mainGameView.removeChild(this);
     }
 }

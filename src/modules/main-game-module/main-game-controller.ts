@@ -1,23 +1,26 @@
-import MainGameView from './main-game-view';
 import { TweenMax } from 'gsap';
-import MapController from './map/map-controller';
+import MapController from './map-controller';
 import CollisionLogic from './collision-logic';
+import { Container } from 'pixi.js';
+import { app } from '../../index';
 
 export default class MainGameController {
-    public view: MainGameView;
+    public view: Container;
     public map: MapController;
     public collisionLogic: CollisionLogic;
+    public isDrawn: boolean = false;
 
     constructor() {
         this.collisionLogic = new CollisionLogic();
-        this.view = new MainGameView();
-        this.map = new MapController();
+        this.view = new Container();
+        this.view.name = 'mainGame'
+        this.map = new MapController(this.view);
+        this.isDrawn = true;
+        app.stage.addChild(this.view);
     }
 
     public drawView(): void {
-        this.map.showView();
-        const mapView = this.map.getView();
-        this.view.addChild(mapView);
+        this.map.createMap();
     }
 
     public showView(): void {
@@ -34,6 +37,7 @@ export default class MainGameController {
             alpha: 0,
             onComplete: () => {
                 this.view.visible = false;
+                app.stage.removeChild(this.view);
             },
         });
     }

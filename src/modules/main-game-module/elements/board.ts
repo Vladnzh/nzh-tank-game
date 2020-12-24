@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
-import { app } from '../../../../index';
-import { DefaultTextureSize } from '../../../constants';
+import { app } from '../../../index';
+import { DefaultTextureSize } from '../../constants';
 import { v4 as uuidv4 } from 'uuid';
 
 export default class Board extends PIXI.Sprite {
@@ -13,8 +13,11 @@ export default class Board extends PIXI.Sprite {
         this.y = DefaultTextureSize.HEIGHT * i;
         this.type = type;
         this.id = uuidv4();
-        app.mainGameModule.collisionLogic.addBoard(this)
+        app.mainGameModule.collisionLogic.addBoard(this);
     }
 
+    public remove(): void {
+        app.mainGameView.removeChild(this);
+    }
 
 }

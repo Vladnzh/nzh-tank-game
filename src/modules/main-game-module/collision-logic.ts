@@ -1,25 +1,35 @@
-import Board from './map/elements/board';
-import Tank from './map/elements/tank';
-import Bullet from './map/elements/bullet';
+import Board from './elements/board';
+import Tank from './elements/tank';
+import Bullet from './elements/bullet';
 import _ from 'lodash';
-import { app } from '../../index';
-import { DIRECTION_NAMES, ElementTypeNames } from '../constants';
+import { DIRECTION_NAMES, ElementTypeNames, EVENT_NAMES } from '../constants';
 import { TypeItemsCollision } from '../../interfaces';
-import Bonus from './map/elements/bonus';
-import { AbstractTank } from './map/elements/abstract-tank';
+import Bonus from './elements/bonus';
+import { AbstractTank } from './elements/abstract-tank';
+import { app } from '../../index';
 
 export default class CollisionLogic {
     protected OFFSET_TANK_POSSIBLE_COLLISION: number = 15;
     protected OFFSET_BULLET_POSSIBLE_COLLISION: number = 10;
     public currentBonusOnMap: Bonus;
+    public ownTank: Tank;
     protected itemsCollision: Array<TypeItemsCollision> = [];
     protected bullets: Array<Bullet> = [];
+
+    private addListeners(): void {
+        document.addEventListener(EVENT_NAMES.KEYDOWN, (e: KeyboardEvent) => this.ownTank.setKeyDown(e));
+        document.addEventListener(EVENT_NAMES.KEYUP, (e: KeyboardEvent) => this.ownTank.setKeyUp(e));
+    }
 
     public addBoard(board: Board) {
         this.itemsCollision.push(board);
     }
 
     public addTank(tank: AbstractTank) {
+        if (tank.type === ElementTypeNames.TANK) {
+            this.ownTank = tank as Tank;
+            this.addListeners();
+        }
         this.itemsCollision.push(tank);
     }
 
@@ -39,7 +49,6 @@ export default class CollisionLogic {
 
     public removeBullet(bullet: Bullet) {
         _.remove(this.bullets, (item: Bullet) => item?.id === bullet?.id);
-        app.mapView.removeChild(bullet.bulletSprite);
         _.forEach(this.bullets, (item: Bullet) => item?.updatePossibleCollision());
     }
 
@@ -47,9 +56,10 @@ export default class CollisionLogic {
         if (collisionItem.type === ElementTypeNames.WALL) {
             return;
         }
-        app.mapView.removeChild(collisionItem);
+        if (collisionItem.type === ElementTypeNames.SMALL_WALL) {
+            (collisionItem as Board).remove();
+        }
         _.remove(this.itemsCollision, (item: TypeItemsCollision) => item?.id === collisionItem?.id);
-
     }
 
     public findBulletPossibleCollision(bullet: Bullet) {
@@ -147,5 +157,20 @@ export default class CollisionLogic {
             }
         });
         return collision;
+    }
+
+    public reset() {
+        _.forEach(this.itemsCollision, (item: TypeItemsCollision) => {
+            if (item.type === ElementTypeNames.TANK
+                || item.type === ElementTypeNames.TANK_ENEMY_WHITE
+                || item.type === ElementTypeNames.TANK_ENEMY_BLUE
+                || item.type === ElementTypeNames.TANK_ENEMY_RED) {
+                (item as AbstractTank).remove();
+            }
+        });
+        this.ownTank.remove();
+        this.currentBonusOnMap = null;
+        this.itemsCollision = [];
+        this.bullets = [];
     }
 }

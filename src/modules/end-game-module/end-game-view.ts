@@ -1,26 +1,24 @@
 import * as PIXI from 'pixi.js';
-import { app, Application } from '../../index';
+import { app } from '../../index';
 import { IResourceDictionary } from 'pixi.js';
 import { centeringItem } from '../../utils';
 import { StateNames } from '../../state-machine/state-machine-constants';
 import { ElementTypeNames, EVENT_NAMES } from '../constants';
 
 export default class EndGameView extends PIXI.Container {
-    public app: Application;
     public background: PIXI.Graphics;
     public startButton: PIXI.Sprite;
     public titleText: PIXI.Text;
 
     constructor() {
         super();
-        this.app = app;
-        this.app.stage.addChild(this);
+        app.stage.addChild(this);
     }
 
     public drawView(resources?: IResourceDictionary): void {
         this.visible = false;
         this.background = new PIXI.Graphics();
-        this.titleText = new PIXI.Text("GAME OVER", {
+        this.titleText = new PIXI.Text('GAME OVER', {
             dropShadow: true,
             dropShadowAlpha: 0.2,
             dropShadowBlur: 4,
@@ -43,8 +41,8 @@ export default class EndGameView extends PIXI.Container {
         this.background.drawRect(0, 0, app.view.width, app.view.height);
         this.background.endFill();
         this.startButton = new PIXI.Sprite(resources[ElementTypeNames.START_BUTTON].texture);
-        this.startButton.position = centeringItem(this.app.view, this.startButton);
-        this.titleText.position = centeringItem(this.app.view, this.titleText);
+        this.startButton.position = centeringItem(app.view, this.startButton);
+        this.titleText.position = centeringItem(app.view, this.titleText);
         this.titleText.y -= this.startButton.height;
         this.addChild(this.background);
         this.addChild(this.startButton);
@@ -53,18 +51,20 @@ export default class EndGameView extends PIXI.Container {
     }
 
     protected addInteractive(): void {
-        this.startButton.interactive = true;
         this.startButton.buttonMode = true;
-
         this.startButton.on(EVENT_NAMES.MOUSEDOWN, () => {
             this.startButton.scale.set(0.95, 0.95);
-            this.startButton.position = centeringItem(this.app.view, this.startButton);
+            this.startButton.position = centeringItem(app.view, this.startButton);
         });
         this.startButton.on(EVENT_NAMES.MOUSEUP, () => {
             this.startButton.scale.set(1, 1);
-            this.startButton.position = centeringItem(this.app.view, this.startButton);
+            this.startButton.position = centeringItem(app.view, this.startButton);
             app.stateMachine.changeState(StateNames.MAIN_GAME_STATE);
         });
+    }
+
+    public interactiveButton(isInteractive: boolean): void {
+        this.startButton.interactive = isInteractive;
     }
 
 }

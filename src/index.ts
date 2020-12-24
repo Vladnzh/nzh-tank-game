@@ -7,15 +7,16 @@ import { StateMachine } from './state-machine/state-machine';
 import StartGame from './modules/start-game-module/start-game-controller';
 import EndGame from './modules/end-game-module/end-game-controller';
 import MainGame from './modules/main-game-module/main-game-controller';
-import MapView from './modules/main-game-module/map/map-view';
 // @ts-ignore
 import PixiFps from "pixi-fps";
+import { Container, Ticker } from 'pixi.js';
 
 const fpsCounter = new PixiFps();
 
 export class Application extends PIXI.Application {
     protected size: Array<number> = [1024, 768];
     public loader: Loader;
+    public ticker: Ticker;
     public stateMachine: StateMachine;
     public startGameModule: StartGame;
     public mainGameModule: MainGame;
@@ -34,19 +35,19 @@ export class Application extends PIXI.Application {
         window.addEventListener('resize', _.debounce(() => app.onResize(), 300));
     }
 
-    get mapView(): MapView {
-        return this.mainGameModule.map.view;
+    get mainGameView(): Container {
+        return this.mainGameModule.view;
     }
 
     public init() {
-
         this.stateMachine = new StateMachine();
         this.loader = new Loader();
         this.startGameModule = new StartGame();
         this.mainGameModule = new MainGame();
         this.endGameModule = new EndGame();
+        this.ticker = new Ticker()
+        this.ticker.start()
         this.stage.addChild(fpsCounter);
-
     }
 
     protected onResize() {

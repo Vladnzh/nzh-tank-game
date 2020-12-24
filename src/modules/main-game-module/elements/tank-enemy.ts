@@ -3,13 +3,14 @@ import Bullet from './bullet';
 import {
     DIRECTION_NAMES,
     ElementTypeNames,
-} from '../../../constants';
+} from '../../constants';
 import { TweenMax } from 'gsap';
 import _ from 'lodash';
 import { AbstractTank } from './abstract-tank';
 
 export default class TankEnemy extends AbstractTank {
     protected DIRECTIONS: Array<string> = [DIRECTION_NAMES.LEFT, DIRECTION_NAMES.RIGHT, DIRECTION_NAMES.DOWN, DIRECTION_NAMES.UP];
+    protected loopCaller: TweenMax;
 
     constructor(texture: PIXI.Texture, type: string, i: number, j: number) {
         super(texture, type, i, j);
@@ -23,13 +24,18 @@ export default class TankEnemy extends AbstractTank {
         }
         this.onRecharge();
         this.setDirection(this.DIRECTIONS[_.random(0, this.DIRECTIONS.length)]);
-        TweenMax.delayedCall(1, () => this.loop());
+        this.loopCaller = TweenMax.delayedCall(1, () => this.loop());
     }
 
     public setDirection(direction: string): void {
         this.inMove = true;
         this.currentDirection = direction;
         this.updatePossibleCollision();
+    }
+
+    public remove(): void {
+        this.loopCaller.kill()
+        super.remove();
     }
 
     protected onRecharge(): void {

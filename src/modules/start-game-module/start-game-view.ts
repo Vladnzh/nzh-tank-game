@@ -5,15 +5,13 @@ import { StateNames } from '../../state-machine/state-machine-constants';
 import { ElementTypeNames, EVENT_NAMES, StartGameNames } from '../constants';
 
 export default class StartGameView extends PIXI.Container {
-    public app: Application;
     public background: PIXI.Graphics;
     public startButton: PIXI.Sprite;
     public titleText: PIXI.Text;
 
     constructor() {
         super();
-        this.app = app;
-        this.app.stage.addChild(this);
+        app.stage.addChild(this);
     }
 
     public drawView(): void {
@@ -43,8 +41,8 @@ export default class StartGameView extends PIXI.Container {
         this.background.endFill();
         const texture = app.loader.getTextureByTypeName(ElementTypeNames.START_BUTTON)
         this.startButton = new PIXI.Sprite(texture);
-        this.startButton.position = centeringItem(this.app.view, this.startButton);
-        this.titleText.position = centeringItem(this.app.view, this.titleText);
+        this.startButton.position = centeringItem(app.view, this.startButton);
+        this.titleText.position = centeringItem(app.view, this.titleText);
         this.titleText.y -= this.startButton.height;
         this.addChild(this.background);
         this.addChild(this.startButton);
@@ -53,18 +51,18 @@ export default class StartGameView extends PIXI.Container {
     }
 
     protected addInteractive(): void {
-        this.startButton.interactive = true;
         this.startButton.buttonMode = true;
-
         this.startButton.on(EVENT_NAMES.MOUSEDOWN, () => {
             this.startButton.scale.set(0.95, 0.95);
-            this.startButton.position = centeringItem(this.app.view, this.startButton);
+            this.startButton.position = centeringItem(app.view, this.startButton);
         });
         this.startButton.on(EVENT_NAMES.MOUSEUP, () => {
             this.startButton.scale.set(1, 1);
-            this.startButton.position = centeringItem(this.app.view, this.startButton);
+            this.startButton.position = centeringItem(app.view, this.startButton);
             app.stateMachine.changeState(StateNames.MAIN_GAME_STATE);
         });
     }
-
+    public interactiveButton(isInteractive: boolean): void {
+        this.startButton.interactive = isInteractive;
+    }
 }

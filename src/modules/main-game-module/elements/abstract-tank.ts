@@ -6,15 +6,14 @@ import {
     DefaultTextureSize,
     DIRECTION_NAMES,
     ElementTypeNames,
-} from '../../../constants';
+} from '../../constants';
 import { TimelineLite, TweenMax } from 'gsap';
-import { TypeItemsCollision } from '../../../../interfaces';
+import { TypeItemsCollision } from '../../../interfaces';
 import Bullet from './bullet';
 import { v4 as uuidv4 } from 'uuid';
-import { itemsIntersect } from '../../../../utils';
-import { app } from '../../../../index';
+import { itemsIntersect } from '../../../utils';
+import { app } from '../../../index';
 import { AnimatedSprite } from 'pixi.js';
-import { StateNames } from '../../../../state-machine/state-machine-constants';
 import { ColorOverlayFilter } from '@pixi/filter-color-overlay';
 
 export class AbstractTank extends PIXI.Container {
@@ -49,14 +48,12 @@ export class AbstractTank extends PIXI.Container {
         this.tankSprite.x = DefaultTextureSize.WIDTH * j + DefaultTextureSize.WIDTH / 2;
         this.tankSprite.y = DefaultTextureSize.HEIGHT * i + DefaultTextureSize.HEIGHT / 2;
         this.tankSprite.anchor.set(0.5);
-        this.ticker = new PIXI.Ticker();
-        this.ticker.add(() => this.update());
-        this.ticker.start();
         this.rechargeMark = new PIXI.Graphics();
         this.rechargeMark.beginFill(0x4df546);
         this.rechargeMark.drawRect(0, 0, this.tankSprite.width, 3);
         this.rechargeMark.endFill();
         this.rechargeMark.alpha = 0.8;
+        app.ticker.add(this.update, this);
         app.mainGameModule.collisionLogic.addTank(this);
         this.rechargeMark.x = this.tankSprite.x - (this.tankSprite.width / 2);
         this.rechargeMark.y = this.tankSprite.y + (this.tankSprite.height / 2);
@@ -74,10 +71,8 @@ export class AbstractTank extends PIXI.Container {
             return;
         }
         if (!this.inMove) {
-            this.ticker.stop();
             return;
         }
-
         this.rechargeMark.x = this.tankSprite.x - (this.tankSprite.width / 2);
         this.rechargeMark.y = this.tankSprite.y + (this.tankSprite.height / 2);
 
@@ -137,8 +132,8 @@ export class AbstractTank extends PIXI.Container {
         }
         this.playExplodeAnimation();
         this.isKilled = true;
-        this.ticker.stop();
         app.mainGameModule.collisionLogic.removeItem(this);
+        app.mainGameView.removeChild(this);
     }
 
     public playExplodeAnimation() {
@@ -148,9 +143,10 @@ export class AbstractTank extends PIXI.Container {
         animation.y = this.tankSprite.y;
         animation.loop = false;
         animation.play();
-        app.mapView.addChild(animation);
+        app.mainGameView.addChild(animation);
         animation.onComplete = () => {
-            app.mapView.removeChild(animation);
+            app.mainGameView.removeChild(animation);
+            app.ticker.remove(this.update, this);
         };
     }
 
@@ -224,6 +220,9 @@ export class AbstractTank extends PIXI.Container {
 
     public updatePossibleCollision(): void {
         this.possibleCollision = app.mainGameModule.collisionLogic.findTankPossibleCollision(this);
+    }
+    public remove(){
+        app.ticker.remove(this.update, this)
     }
 
 }

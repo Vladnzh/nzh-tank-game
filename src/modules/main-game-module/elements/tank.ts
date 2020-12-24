@@ -1,39 +1,21 @@
-import * as PIXI from 'pixi.js';
 import Bullet from './bullet';
 import {
     DIRECTION_NAMES,
     ElementTypeNames,
-    EVENT_NAMES,
-} from '../../../constants';
-import { app } from '../../../../index';
+} from '../../constants';
+import { app } from '../../../index';
 import Board from './board';
 import { TimelineLite } from 'gsap';
-import { StateNames } from '../../../../state-machine/state-machine-constants';
-import { TypeItemsCollision } from '../../../../interfaces';
+import { StateNames } from '../../../state-machine/state-machine-constants';
+import { TypeItemsCollision } from '../../../interfaces';
 import { AbstractTank } from './abstract-tank';
 
 export default class Tank extends AbstractTank {
-
-    constructor(texture: PIXI.Texture, type: string, i: number, j: number) {
-        super(texture, type, i, j);
-        this.addListeners();
-    }
-
-    private addListeners(): void {
-        document.addEventListener(EVENT_NAMES.KEYDOWN, this.setKeyDown.bind(this));
-        document.addEventListener(EVENT_NAMES.KEYUP, this.setKeyUp.bind(this));
-    }
-
-    private removeListeners(): void {
-        document.removeEventListener(EVENT_NAMES.KEYDOWN, this.setKeyDown.bind(this));
-        document.removeEventListener(EVENT_NAMES.KEYUP, this.setKeyUp.bind(this));
-    }
 
     public onExplode(): void {
         if (!this.isDrown) {
             super.onExplode();
         }
-        this.removeListeners();
         app.stateMachine.changeState(StateNames.END_GAME_STATE);
     }
 
@@ -64,7 +46,6 @@ export default class Tank extends AbstractTank {
     }
 
     public setKeyDown(e: KeyboardEvent): void {
-        this.ticker.start();
         switch (e.keyCode) {
             case 87 || 38 : {
                 this.inMove = true;
@@ -91,7 +72,6 @@ export default class Tank extends AbstractTank {
     }
 
     public setKeyUp(e: KeyboardEvent): void {
-        this.ticker.start();
         switch (e.keyCode) {
             case 32: {
                 if (this.inRecharge) {

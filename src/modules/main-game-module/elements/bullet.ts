@@ -1,17 +1,16 @@
 import * as PIXI from 'pixi.js';
-import { app } from '../../../../index';
-import { AnimationsNames, DefaultParams, DIRECTION_NAMES, ElementTypeNames } from '../../../constants';
+import { app } from '../../../index';
+import { AnimationsNames, DefaultParams, DIRECTION_NAMES, ElementTypeNames } from '../../constants';
 import { AnimatedSprite } from 'pixi.js';
-import { TypeItemsCollision } from '../../../../interfaces';
+import { TypeItemsCollision } from '../../../interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash';
 import TankEnemy from './tank-enemy';
 import Tank from './tank';
-import { StateNames } from '../../../../state-machine/state-machine-constants';
+import { StateNames } from '../../../state-machine/state-machine-constants';
 
 export default class Bullet {
     public id: string;
-    protected ticker: PIXI.Ticker;
     protected speed: number;
     private OFFSET: number = 15;
     protected type: string;
@@ -28,10 +27,8 @@ export default class Bullet {
         this.currentDirection = direction;
         this.setPosition(x, y);
         this.bulletSprite.anchor.set(0.5);
-        this.ticker = new PIXI.Ticker();
-        this.ticker.add(() => this.update());
-        this.ticker.start();
-        app.mapView.addChild(this.bulletSprite);
+        app.ticker.add(this.update, this);
+        app.mainGameView.addChild(this.bulletSprite);
         app.mainGameModule.collisionLogic.addBullet(this);
         this.updatePossibleCollision();
     }
@@ -73,9 +70,9 @@ export default class Bullet {
         animation.y = this.bulletSprite.y;
         animation.loop = false;
         animation.play();
-        app.mapView.addChild(animation);
+        app.mainGameView.addChild(animation);
         animation.onComplete = () => {
-            app.mapView.removeChild(animation);
+            app.mainGameView.removeChild(animation);
         };
     }
 
@@ -93,8 +90,9 @@ export default class Bullet {
 
     public onExplode(): void {
         this.playAnimation();
+        app.mainGameView.removeChild(this.bulletSprite)
+        app.ticker.remove(this.update, this);
         app.mainGameModule.collisionLogic.removeBullet(this);
-        this.ticker.stop();
     }
 
     protected onCollisionHappened(collisionItem: TypeItemsCollision): void {
@@ -141,10 +139,6 @@ export default class Bullet {
             }
             case DIRECTION_NAMES.RIGHT : {
                 this.bulletSprite.x += this.speed;
-                break;
-            }
-            case null : {
-                this.ticker.stop();
                 break;
             }
         }
