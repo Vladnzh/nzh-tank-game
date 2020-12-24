@@ -1,70 +1,21 @@
-import * as PIXI from 'pixi.js';
 import { app } from '../../index';
-import { IResourceDictionary } from 'pixi.js';
 import { centeringItem } from '../../utils';
-import { StateNames } from '../../state-machine/state-machine-constants';
-import { ElementTypeNames, EVENT_NAMES } from '../constants';
+import { END_GAME_NAMES, SoundNames } from '../constants';
+import StartGameView from '../start-game-module/start-game-view';
 
-export default class EndGameView extends PIXI.Container {
-    public background: PIXI.Graphics;
-    public startButton: PIXI.Sprite;
-    public titleText: PIXI.Text;
-
+export default class EndGameView extends StartGameView {
     constructor() {
         super();
         app.stage.addChild(this);
     }
 
-    public drawView(resources?: IResourceDictionary): void {
-        this.visible = false;
-        this.background = new PIXI.Graphics();
-        this.titleText = new PIXI.Text('GAME OVER', {
-            dropShadow: true,
-            dropShadowAlpha: 0.2,
-            dropShadowBlur: 4,
-            dropShadowDistance: 8,
-            fill: [
-                '#3f5568',
-                '#0a1f2f',
-            ],
-            fillGradientStops: [
-                0.50,
-                0.1,
-            ],
-            fontFamily: 'Arial Black',
-            fontSize: 100,
-            fontWeight: 'bold',
-            miterLimit: 15,
-            strokeThickness: 6,
-        });
-        this.background.beginFill(0x0a332e);
-        this.background.drawRect(0, 0, app.view.width, app.view.height);
-        this.background.endFill();
-        this.startButton = new PIXI.Sprite(resources[ElementTypeNames.START_BUTTON].texture);
-        this.startButton.position = centeringItem(app.view, this.startButton);
+    public drawView(): void {
+        super.drawView();
+        const isWin = !!app.mainGameModule.amountEnemyTanks;
+        app.loader.playSoundByName(isWin ? SoundNames.WIN : SoundNames.LOSE);
+        this.titleText.text = isWin ? END_GAME_NAMES.YOU_DIED : END_GAME_NAMES.YOU_WON;
         this.titleText.position = centeringItem(app.view, this.titleText);
         this.titleText.y -= this.startButton.height;
-        this.addChild(this.background);
-        this.addChild(this.startButton);
-        this.addChild(this.titleText);
-        this.addInteractive();
-    }
-
-    protected addInteractive(): void {
-        this.startButton.buttonMode = true;
-        this.startButton.on(EVENT_NAMES.MOUSEDOWN, () => {
-            this.startButton.scale.set(0.95, 0.95);
-            this.startButton.position = centeringItem(app.view, this.startButton);
-        });
-        this.startButton.on(EVENT_NAMES.MOUSEUP, () => {
-            this.startButton.scale.set(1, 1);
-            this.startButton.position = centeringItem(app.view, this.startButton);
-            app.stateMachine.changeState(StateNames.MAIN_GAME_STATE);
-        });
-    }
-
-    public interactiveButton(isInteractive: boolean): void {
-        this.startButton.interactive = isInteractive;
     }
 
 }

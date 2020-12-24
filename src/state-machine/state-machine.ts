@@ -1,7 +1,6 @@
 import { StateNames } from './state-machine-constants';
 import { app } from '../index';
 import MainGameController from '../modules/main-game-module/main-game-controller';
-import { Ticker } from 'pixi.js';
 
 export class StateMachine {
     private prevState: string;
@@ -34,12 +33,10 @@ export class StateMachine {
                 break;
             }
             case StateNames.END_GAME_STATE : {
-                // app.ticker.stop()
-                // app.ticker = new Ticker()
-                app.mainGameModule.collisionLogic.reset();
+                app.mainGameModule.reset();
                 app.mainGameModule.hideView();
-                app.mainGameModule = new MainGameController()
                 app.endGameModule.showView();
+                app.mainGameModule = new MainGameController()
                 break;
             }
         }

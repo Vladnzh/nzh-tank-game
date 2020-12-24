@@ -7,11 +7,7 @@ import { StateMachine } from './state-machine/state-machine';
 import StartGame from './modules/start-game-module/start-game-controller';
 import EndGame from './modules/end-game-module/end-game-controller';
 import MainGame from './modules/main-game-module/main-game-controller';
-// @ts-ignore
-import PixiFps from "pixi-fps";
 import { Container, Ticker } from 'pixi.js';
-
-const fpsCounter = new PixiFps();
 
 export class Application extends PIXI.Application {
     protected size: Array<number> = [1024, 768];
@@ -47,7 +43,6 @@ export class Application extends PIXI.Application {
         this.endGameModule = new EndGame();
         this.ticker = new Ticker()
         this.ticker.start()
-        this.stage.addChild(fpsCounter);
     }
 
     protected onResize() {

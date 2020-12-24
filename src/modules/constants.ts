@@ -16,6 +16,11 @@ export class DIRECTION_NAMES {
     static readonly RIGHT = 'RIGHT';
 }
 
+export class END_GAME_NAMES {
+    static readonly YOU_WON = 'YOU WON';
+    static readonly YOU_DIED = 'GAME OVER';
+}
+
 export class ElementTypeNames {
     static readonly LOADER_BAR = 'loaderBar';
     static readonly LOADER_BG = 'loaderBg';
@@ -35,6 +40,16 @@ export class ElementTypeNames {
     static readonly START_BUTTON = 'startButton';
     static readonly BULLET = 'bullet';
     static readonly BULLET_ENEMY = 'bulletEnemy';
+    static readonly HEART = 'heart';
+}
+
+export class SoundNames {
+    static readonly BONUS = 'bonusSound';
+    static readonly EXPLODE = 'explodeSound';
+    static readonly HIT = 'hitSound';
+    static readonly LOSE = 'loseSound';
+    static readonly SHOT = 'shotSound';
+    static readonly WIN = 'winSound';
 }
 
 export class AnimationsNames {
@@ -60,4 +75,5 @@ export class DefaultParams {
     static readonly BONUS_IMMORTAL_EXPIRATION_TIME: number = 2;
     static readonly RECHARGE_TIME: number = 1.5;
     static readonly AMOUNT_LIFE: number = 0;
+    static readonly MAX_AMOUNT_LIFE: number = 3;
 }

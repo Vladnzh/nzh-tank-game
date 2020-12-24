@@ -1,5 +1,4 @@
 import EndGameView from './end-game-view';
-import { IResourceDictionary } from 'pixi.js';
 import { app } from '../../index';
 import { TimelineLite, TweenMax } from 'gsap';
 
@@ -11,8 +10,7 @@ export default class EndGameController {
     }
 
     public drawView(): void {
-        const resources: IResourceDictionary = app.loader.resources;
-        this.view.drawView(resources);
+        this.view.drawView();
     }
 
     public showView(): void {

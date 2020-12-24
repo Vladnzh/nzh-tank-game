@@ -1,11 +1,12 @@
 import * as PIXI from 'pixi.js';
+import Sound from 'pixi-sound';
 import LoaderView from './loader-view';
-import { AnimatedSprite, IResourceDictionary, Loader, Sprite } from 'pixi.js';
+import { AnimatedSprite, IResourceDictionary, Loader } from 'pixi.js';
 import _ from 'lodash';
 import { app } from '../../index';
 import { StateNames } from '../../state-machine/state-machine-constants';
 import { TweenMax } from 'gsap';
-import { AnimationsNames, ElementTypeNames } from '../constants';
+import { AnimationsNames, ElementTypeNames, SoundNames } from '../constants';
 
 export default class LoaderController extends PIXI.Loader {
     protected view: LoaderView;
@@ -46,9 +47,15 @@ export default class LoaderController extends PIXI.Loader {
             .add(ElementTypeNames.START_BUTTON, 'button.png')
             .add(ElementTypeNames.BULLET, 'bullet.png')
             .add(ElementTypeNames.BULLET_ENEMY, 'enemy_bullet.png')
+            .add(ElementTypeNames.HEART, 'heart.png')
             .add(AnimationsNames.ANIMATIONS, 'animations.json')
+            .add(SoundNames.BONUS, 'sounds/bonus.wav')
+            .add(SoundNames.EXPLODE, 'sounds/explode.wav')
+            .add(SoundNames.HIT, 'sounds/hit.wav')
+            .add(SoundNames.LOSE, 'sounds/lose.wav')
+            .add(SoundNames.SHOT, 'sounds/shot.wav')
+            .add(SoundNames.WIN, 'sounds/win.wav')
             .load();
-
         this.onProgress.add(this.onProgressCallBack.bind(this));
         this.onComplete.add(this.onCompleteCallBack.bind(this));
         this.progressBarLoader.onComplete.add(this.progressBarLoaderOnCompleteCallBack.bind(this));
@@ -57,6 +64,10 @@ export default class LoaderController extends PIXI.Loader {
 
     public getTextureByTypeName(typeName: string): PIXI.Texture {
         return this.resources[typeName].texture;
+    }
+
+    public playSoundByName(name: string) {
+        Sound.play(name);
     }
 
     protected progressBarLoaderOnCompleteCallBack(e: Loader): void {

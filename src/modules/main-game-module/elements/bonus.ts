@@ -12,10 +12,10 @@ export default class Bonus extends PIXI.Sprite {
         this.x = x;
         this.y = y;
         this.type = type;
-        app.mainGameModule.collisionLogic.addBonus(this);
+        app.mainGameModule.addBonus(this);
     }
     public remove(){
-        app.mainGameModule.collisionLogic.removeBonus(this);
+        app.mainGameModule.removeBonus(this);
         app.mainGameView.removeChild(this);
     }
 }

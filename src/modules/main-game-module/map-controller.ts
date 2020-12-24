@@ -1,10 +1,10 @@
 import { TweenMax } from 'gsap';
 import { app } from '../../index';
-import PIXI, { Container, Point } from 'pixi.js';
-import { mapMatrix, textureBonusNames, textureTankNames } from '../../utils';
+import PIXI, { Container, Point, Sprite } from 'pixi.js';
+import { centeringItem, mapMatrix, textureBonusNames, textureTankNames } from '../../utils';
 import Board from './elements/board';
 import Tank from './elements/tank';
-import { DefaultTextureSize, ElementTypeNames } from '../constants';
+import { DefaultParams, DefaultTextureSize, ElementTypeNames } from '../constants';
 import TankEnemy from './elements/tank-enemy';
 import Bonus from './elements/bonus';
 import _ from 'lodash';
@@ -12,12 +12,12 @@ import _ from 'lodash';
 export default class MapController {
     protected emptySpaces: Array<PIXI.Point> = [];
     protected textureTankNames: Array<string>;
+    public lifeSprites: Array<Sprite> = [];
     public view: Container;
 
     constructor(view: Container) {
         this.view = view;
     }
-
 
     public createMap(): void {
         this.textureTankNames = _.cloneDeep(textureTankNames);
@@ -43,7 +43,7 @@ export default class MapController {
     };
 
     protected bonusGenerationLoop(): void {
-        if (!app.mainGameModule.collisionLogic.currentBonusOnMap) {
+        if (!app.mainGameModule.currentBonusOnMap) {
             this.createBonus(this.emptySpaces[_.random(0, this.emptySpaces.length - 1)]);
         }
         TweenMax.delayedCall(_.random(5, 8), () => this.bonusGenerationLoop());
@@ -101,12 +101,26 @@ export default class MapController {
 
     protected createBonus(point: PIXI.Point): void {
         if (point) {
-            const textureTypeName = textureBonusNames[2];
-            // const textureTypeName = textureBonusNames[_.random(0, textureBonusNames.length - 1)];
+            const textureTypeName = textureBonusNames[_.random(0, textureBonusNames.length - 1)];
             let texture = app.loader.getTextureByTypeName(textureTypeName);
             let sprite = new Bonus(texture, textureTypeName, point.x, point.y);
             this.view.addChild(sprite);
         }
+    }
+
+    public createLife(amount: number): void {
+        let texture = app.loader.getTextureByTypeName(ElementTypeNames.HEART);
+        for (let i = 0; i < DefaultParams.MAX_AMOUNT_LIFE + 1; i++) {
+            const sprite = new Sprite(texture);
+            // centeringItem(app.view, sprite);
+            sprite.x += sprite.height * i;
+            sprite.y = app.view.height - 50;
+            sprite.visible = false;
+            sprite.name = `life_${amount}`;
+            this.lifeSprites.push(sprite);
+            this.view.addChild(sprite);
+        }
+
     }
 
     protected createBoardFromSmallBoard(i: number, j: number) {

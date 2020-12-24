@@ -24,7 +24,7 @@ export default class TankEnemy extends AbstractTank {
         }
         this.onRecharge();
         this.setDirection(this.DIRECTIONS[_.random(0, this.DIRECTIONS.length)]);
-        this.loopCaller = TweenMax.delayedCall(1, () => this.loop());
+        this.loopCaller = TweenMax.delayedCall(_.random(1, 1.5), () => this.loop());
     }
 
     public setDirection(direction: string): void {
@@ -34,7 +34,7 @@ export default class TankEnemy extends AbstractTank {
     }
 
     public remove(): void {
-        this.loopCaller.kill()
+        this.loopCaller.kill();
         super.remove();
     }
 

@@ -1,22 +1,27 @@
 import Bullet from './bullet';
 import {
+    DefaultParams,
     DIRECTION_NAMES,
     ElementTypeNames,
 } from '../../constants';
-import { app } from '../../../index';
 import Board from './board';
 import { TimelineLite } from 'gsap';
-import { StateNames } from '../../../state-machine/state-machine-constants';
 import { TypeItemsCollision } from '../../../interfaces';
 import { AbstractTank } from './abstract-tank';
+import { StateNames } from '../../../state-machine/state-machine-constants';
+import { app } from '../../../index';
+import Bonus from './bonus';
 
 export default class Tank extends AbstractTank {
 
-    public onExplode(): void {
-        if (!this.isDrown) {
-            super.onExplode();
+    public onExplode() {
+        if (this.amountLife) {
+            app.mainGameModule.map.lifeSprites[this.amountLife].visible = false;
         }
-        app.stateMachine.changeState(StateNames.END_GAME_STATE);
+        super.onExplode();
+        if (this.isKilled) {
+            app.stateMachine.changeState(StateNames.END_GAME_STATE);
+        }
     }
 
     protected onCollisionHappened(collisionItem: TypeItemsCollision): void {
@@ -29,6 +34,7 @@ export default class Tank extends AbstractTank {
 
     public onDrown(water: Board): void {
         this.isDrown = true;
+        this.amountLife = 0;
         this.removeChild(this.rechargeMark);
         const tl = new TimelineLite;
         tl.to(this.tankSprite, 1.5, {
@@ -45,7 +51,17 @@ export default class Tank extends AbstractTank {
         });
     }
 
+    protected onActiveBonus(bonus: Bonus): void {
+        super.onActiveBonus(bonus);
+        if (this.currentBonusType === ElementTypeNames.BONUS_LIVE && this.amountLife <= DefaultParams.MAX_AMOUNT_LIFE) {
+            app.mainGameModule.map.lifeSprites[this.amountLife].visible = true;
+        }
+    }
+
     public setKeyDown(e: KeyboardEvent): void {
+        if (this.isKilled) {
+            return;
+        }
         switch (e.keyCode) {
             case 87 || 38 : {
                 this.inMove = true;
@@ -68,10 +84,17 @@ export default class Tank extends AbstractTank {
                 break;
             }
         }
+    }
+
+    public update(): void {
         this.updatePossibleCollision();
+        super.update();
     }
 
     public setKeyUp(e: KeyboardEvent): void {
+        if (this.isKilled) {
+            return;
+        }
         switch (e.keyCode) {
             case 32: {
                 if (this.inRecharge) {

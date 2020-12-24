@@ -1,18 +1,31 @@
 {
-    "compilerOptions": {
-        "module": "none",
-        "target": "es6",
-        "noImplicitAny": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "sourceMap": true,
-        "inlineSources": true,
-        "declaration": true,
-        "baseUrl": ".",
-        "esModuleInterop": true,
-        "typeRoots" : ["node_modules/pixi.js", "node_modules/pixi-spine"],
-        "types" : ["pixi.js", "@pixi/filter-color-overlay", "pixi-spine"]
-    },
-    "include": ["**/*.ts"],
-    "exclude": ["node_modules"]
+  "compilerOptions": {
+    "module": "none",
+    "target": "es6",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "declaration": true,
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "typeRoots": [
+      "node_modules/pixi.js",
+      "node_modules/pixi-spine",
+      "node_modules/pixi-sound"
+    ],
+    "types": [
+      "pixi.js",
+      "@pixi/filter-color-overlay",
+      "pixi-spine",
+      "pixi-sound"
+    ]
+  },
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

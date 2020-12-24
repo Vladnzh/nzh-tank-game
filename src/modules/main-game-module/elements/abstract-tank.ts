@@ -5,7 +5,7 @@ import {
     DefaultParams,
     DefaultTextureSize,
     DIRECTION_NAMES,
-    ElementTypeNames,
+    ElementTypeNames, SoundNames,
 } from '../../constants';
 import { TimelineLite, TweenMax } from 'gsap';
 import { TypeItemsCollision } from '../../../interfaces';
@@ -24,12 +24,14 @@ export class AbstractTank extends PIXI.Container {
     public currentDirection: string;
     public currentBonusType: string;
     private RECHARGE_MARK_OFFSET: number = 3.5;
-    protected ticker: PIXI.Ticker;
-    protected amountLife: number;
+    private IMMORTAL_SHIELD_WIDTH: number = 43;
+    private IMMORTAL_SHIELD_HEIGHT: number = 43;
+    public amountLife: number;
     protected speed: number;
     protected rechargeTime: number;
     protected rechargeTimeline: TimelineLite;
     protected rechargeMark: PIXI.Graphics;
+    protected immortalShield: PIXI.Graphics;
     protected bullet: Bullet;
     protected inMove: boolean;
     protected isDrown: boolean = false;
@@ -54,9 +56,17 @@ export class AbstractTank extends PIXI.Container {
         this.rechargeMark.endFill();
         this.rechargeMark.alpha = 0.8;
         app.ticker.add(this.update, this);
-        app.mainGameModule.collisionLogic.addTank(this);
+        app.mainGameModule.addTank(this);
         this.rechargeMark.x = this.tankSprite.x - (this.tankSprite.width / 2);
         this.rechargeMark.y = this.tankSprite.y + (this.tankSprite.height / 2);
+        this.immortalShield = new PIXI.Graphics();
+        this.immortalShield.lineStyle(1, 0x00494b);
+        this.immortalShield.drawRoundedRect(0, 0, this.IMMORTAL_SHIELD_WIDTH, this.IMMORTAL_SHIELD_HEIGHT, 20);
+        this.immortalShield.endFill();
+        this.immortalShield.x = this.tankSprite.x - this.tankSprite.width + 5;
+        this.immortalShield.y = this.tankSprite.y - this.IMMORTAL_SHIELD_WIDTH / 2;
+        this.immortalShield.visible = false;
+        this.addChild(this.immortalShield);
         this.addChild(this.tankSprite);
         this.addChild(this.rechargeMark);
         this.updatePossibleCollision();
@@ -75,7 +85,8 @@ export class AbstractTank extends PIXI.Container {
         }
         this.rechargeMark.x = this.tankSprite.x - (this.tankSprite.width / 2);
         this.rechargeMark.y = this.tankSprite.y + (this.tankSprite.height / 2);
-
+        this.immortalShield.x = this.tankSprite.x - this.tankSprite.width + 5;
+        this.immortalShield.y = this.tankSprite.y - this.IMMORTAL_SHIELD_WIDTH / 2;
         switch (this.currentDirection) {
             case DIRECTION_NAMES.UP : {
                 this.tankSprite.y -= this.speed;
@@ -115,14 +126,11 @@ export class AbstractTank extends PIXI.Container {
     }
 
 
-    protected checkBonus(collisionItem: TypeItemsCollision): void {
-        if (collisionItem.type === ElementTypeNames.BONUS_SLOW
+    protected checkBonus(collisionItem: TypeItemsCollision): boolean {
+        return collisionItem.type === ElementTypeNames.BONUS_SLOW
             || collisionItem.type === ElementTypeNames.BONUS_LIVE
             || collisionItem.type === ElementTypeNames.BONUS_IMMORTAL
-            || collisionItem.type === ElementTypeNames.BONUS_SPEED) {
-            this.onActiveBonus(collisionItem as Bonus);
-            return;
-        }
+            || collisionItem.type === ElementTypeNames.BONUS_SPEED;
     }
 
     public onExplode(): void {
@@ -130,13 +138,19 @@ export class AbstractTank extends PIXI.Container {
             this.amountLife--;
             return;
         }
-        this.playExplodeAnimation();
-        this.isKilled = true;
-        app.mainGameModule.collisionLogic.removeItem(this);
+        if (this.isImmortal) {
+            return;
+        }
+        if (!this.isDrown) {
+            this.playExplodeAnimation();
+        }
+        app.mainGameModule.removeItem(this);
         app.mainGameView.removeChild(this);
+        this.remove();
     }
 
     public playExplodeAnimation() {
+        app.loader.playSoundByName(SoundNames.EXPLODE);
         const animation: AnimatedSprite = app.loader.getAnimation(AnimationsNames.EXPLODE_SPRITE);
         animation.anchor.set(0.5);
         animation.x = this.tankSprite.x;
@@ -146,24 +160,25 @@ export class AbstractTank extends PIXI.Container {
         app.mainGameView.addChild(animation);
         animation.onComplete = () => {
             app.mainGameView.removeChild(animation);
-            app.ticker.remove(this.update, this);
         };
     }
 
     protected onActiveBonus(bonus: Bonus): void {
+        app.loader.playSoundByName(SoundNames.BONUS);
         this.currentBonusType = bonus.type;
         let delay: number = DefaultParams.BONUS_EXPIRATION_TIME;
         if (this.currentBonusType === ElementTypeNames.BONUS_SPEED) {
             this.setSpeed(DefaultParams.TANK_SPEED * 2);
         }
         if (this.currentBonusType === ElementTypeNames.BONUS_SLOW) {
-            this.setSpeed(DefaultParams.TANK_SPEED * 2);
+            this.setSpeed(DefaultParams.TANK_SPEED / 2);
         }
-        if (this.currentBonusType === ElementTypeNames.BONUS_LIVE && this.amountLife <= 3) {
+        if (this.currentBonusType === ElementTypeNames.BONUS_LIVE && this.amountLife <= DefaultParams.MAX_AMOUNT_LIFE) {
             this.amountLife++;
         }
         if (this.currentBonusType === ElementTypeNames.BONUS_IMMORTAL) {
             this.isImmortal = true;
+            this.immortalShield.visible = true;
             delay = DefaultParams.BONUS_IMMORTAL_EXPIRATION_TIME;
         }
         TweenMax.delayedCall(delay, () => this.onDisActiveBonus());
@@ -177,12 +192,15 @@ export class AbstractTank extends PIXI.Container {
         }
         if (this.currentBonusType === ElementTypeNames.BONUS_IMMORTAL) {
             this.isImmortal = false;
+            this.immortalShield.visible = false;
         }
         this.currentBonusType = null;
     }
 
     protected onCollisionHappened(collisionItem: TypeItemsCollision): void {
-        this.checkBonus(collisionItem);
+        if (this.checkBonus(collisionItem)) {
+            this.onActiveBonus(collisionItem as Bonus);
+        }
         switch (this.currentDirection) {
             case DIRECTION_NAMES.UP : {
                 this.tankSprite.y += this.speed;
@@ -219,10 +237,12 @@ export class AbstractTank extends PIXI.Container {
     }
 
     public updatePossibleCollision(): void {
-        this.possibleCollision = app.mainGameModule.collisionLogic.findTankPossibleCollision(this);
+        this.possibleCollision = app.mainGameModule.findTankPossibleCollision(this);
     }
-    public remove(){
-        app.ticker.remove(this.update, this)
+
+    public remove() {
+        this.isKilled = true;
+        app.ticker.remove(this.update, this);
     }
 
 }
