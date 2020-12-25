@@ -6,17 +6,18 @@ import Bonus from './elements/bonus';
 import Tank from './elements/tank';
 import { TypeItemsCollision } from '../../interfaces';
 import Bullet from './elements/bullet';
-import { DIRECTION_NAMES, ElementTypeNames, EVENT_NAMES } from '../constants';
+import { DefaultParams, DIRECTION_NAMES, ElementTypeNames, EVENT_NAMES } from '../constants';
 import Board from './elements/board';
 import { AbstractTank } from './elements/abstract-tank';
 import _ from 'lodash';
 import { isIgnoreTypeForBullet, isIgnoreTypeForTank, isAnyTank } from '../../utils';
 import { StateNames } from '../../state-machine/state-machine-constants';
+import MainGameView from './main-game-view';
 
 export default class MainGameController {
     protected OFFSET_TANK_POSSIBLE_COLLISION: number = 15;
     protected OFFSET_BULLET_POSSIBLE_COLLISION: number = 10;
-    public view: Container;
+    public view: MainGameView;
     public map: MapController;
     public currentBonusOnMap: Bonus;
     public ownTank: Tank;
@@ -25,10 +26,16 @@ export default class MainGameController {
     protected bullets: Array<Bullet> = [];
 
     constructor() {
-        this.view = new Container();
-        this.view.name = 'mainGame';
+        this.view = new MainGameView();
         this.map = new MapController(this.view);
-        app.stage.addChild(this.view);
+    }
+
+    private addListeners(): void {
+        document.addEventListener(EVENT_NAMES.KEYDOWN, (e: KeyboardEvent) => this.ownTank.setKeyDown(e));
+        document.addEventListener(EVENT_NAMES.KEYUP, (e: KeyboardEvent) => this.ownTank.setKeyUp(e));
+        window.onblur = () => {
+            app.stateMachine.changeState(StateNames.PAUSE_STATE);
+        };
     }
 
     public drawView(): void {
@@ -44,24 +51,19 @@ export default class MainGameController {
         this.drawView();
         this.view.alpha = 0;
         this.view.visible = true;
-        TweenMax.to(this.view, 1, {
+        TweenMax.to(this.view, DefaultParams.TRANSITION_VIEW_DURATION, {
             alpha: 1,
         });
     }
 
     public hideView(): void {
-        TweenMax.to(this.view, 1, {
+        TweenMax.to(this.view, DefaultParams.TRANSITION_VIEW_DURATION, {
             alpha: 0,
             onComplete: () => {
                 this.view.visible = false;
                 app.stage.removeChild(this.view);
             },
         });
-    }
-
-    private addListeners(): void {
-        document.addEventListener(EVENT_NAMES.KEYDOWN, (e: KeyboardEvent) => this.ownTank.setKeyDown(e));
-        document.addEventListener(EVENT_NAMES.KEYUP, (e: KeyboardEvent) => this.ownTank.setKeyUp(e));
     }
 
     public addBoard(board: Board) {
@@ -127,8 +129,8 @@ export default class MainGameController {
             if (isAnyTank(item)) {
                 x = (item as AbstractTank).tankSprite.x;
                 y = (item as AbstractTank).tankSprite.y;
-                width = (item as AbstractTank).width;
-                height = (item as AbstractTank).height;
+                width = (item as AbstractTank).tankSprite.width;
+                height = (item as AbstractTank).tankSprite.height;
             }
             switch (bullet.currentDirection) {
                 case DIRECTION_NAMES.UP : {
@@ -170,30 +172,30 @@ export default class MainGameController {
             if (isAnyTank(item)) {
                 x = (item as AbstractTank).tankSprite.x;
                 y = (item as AbstractTank).tankSprite.y;
-                width = (item as AbstractTank).width;
-                height = (item as AbstractTank).height;
+                width = (item as AbstractTank).tankSprite.width;
+                height = (item as AbstractTank).tankSprite.height;
             }
             switch (tank.currentDirection) {
                 case DIRECTION_NAMES.UP : {
-                    return y < tank.tankSprite.y - tank.tankSprite.height
+                    return y < tank.tankSprite.y
                         && x + width + this.OFFSET_TANK_POSSIBLE_COLLISION > tank.tankSprite.x
                         && x < tank.tankSprite.x + tank.tankSprite.width + this.OFFSET_TANK_POSSIBLE_COLLISION
                         && !isIgnoreTypeForTank(item.type);
                 }
                 case DIRECTION_NAMES.LEFT : {
-                    return x < tank.tankSprite.x - tank.tankSprite.width
+                    return x < tank.tankSprite.x
                         && y + height + this.OFFSET_TANK_POSSIBLE_COLLISION > tank.tankSprite.y
                         && y < tank.tankSprite.y + tank.tankSprite.width + this.OFFSET_TANK_POSSIBLE_COLLISION
                         && !isIgnoreTypeForTank(item.type);
                 }
                 case DIRECTION_NAMES.DOWN : {
-                    return y > tank.tankSprite.y - tank.tankSprite.height
+                    return y > tank.tankSprite.y
                         && x + width + this.OFFSET_TANK_POSSIBLE_COLLISION > tank.tankSprite.x
                         && x < tank.tankSprite.x + tank.tankSprite.width
                         && !isIgnoreTypeForTank(item.type);
                 }
                 case DIRECTION_NAMES.RIGHT : {
-                    return x > tank.tankSprite.x - tank.tankSprite.width
+                    return x > tank.tankSprite.x
                         && y + height + this.OFFSET_TANK_POSSIBLE_COLLISION > tank.tankSprite.y
                         && y < tank.tankSprite.y + tank.tankSprite.width + this.OFFSET_TANK_POSSIBLE_COLLISION
                         && !isIgnoreTypeForTank(item.type);
@@ -203,7 +205,7 @@ export default class MainGameController {
         return collision;
     }
 
-    public reset() {
+    public removeChildren() {
         _.forEach(this.itemsForCollision, (item: TypeItemsCollision) => {
             if (isAnyTank(item)) {
                 (item as AbstractTank).remove();

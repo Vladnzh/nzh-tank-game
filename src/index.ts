@@ -1,5 +1,6 @@
 import './styles.css';
 import * as PIXI from 'pixi.js';
+
 window.PIXI = PIXI;
 import Loader from './modules/loader-module/loader-controller';
 import _ from 'lodash';
@@ -8,15 +9,18 @@ import StartGame from './modules/start-game-module/start-game-controller';
 import EndGame from './modules/end-game-module/end-game-controller';
 import MainGame from './modules/main-game-module/main-game-controller';
 import { Container, Ticker } from 'pixi.js';
+import PauseGame from './modules/pause-game-module/pause-game-controller';
 
 export class Application extends PIXI.Application {
     protected size: Array<number> = [1024, 768];
+    public isPause = false;
     public loader: Loader;
     public ticker: Ticker;
     public stateMachine: StateMachine;
     public startGameModule: StartGame;
     public mainGameModule: MainGame;
     public endGameModule: EndGame;
+    public pauseGameModule: PauseGame;
 
     constructor() {
         super();
@@ -41,8 +45,9 @@ export class Application extends PIXI.Application {
         this.startGameModule = new StartGame();
         this.mainGameModule = new MainGame();
         this.endGameModule = new EndGame();
-        this.ticker = new Ticker()
-        this.ticker.start()
+        this.pauseGameModule = new PauseGame();
+        this.ticker = new Ticker();
+        this.ticker.start();
     }
 
     protected onResize() {

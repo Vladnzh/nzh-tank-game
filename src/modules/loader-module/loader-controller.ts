@@ -17,14 +17,13 @@ export default class LoaderController extends PIXI.Loader {
         this.init();
     }
 
-    public init(): void {
+    protected init(): void {
         this.loadResources();
         this.view = new LoaderView();
     }
 
     protected loadResources(): void {
         app.stateMachine.changeState(StateNames.LOADER_STATE);
-
         this.baseUrl = '../../../assets';
         this.progressBarLoader = new PIXI.Loader(this.baseUrl);
         this.progressBarLoader.add(ElementTypeNames.LOADER_BAR, 'loader-bar/loader-bar.png')
@@ -48,6 +47,8 @@ export default class LoaderController extends PIXI.Loader {
             .add(ElementTypeNames.BULLET, 'bullet.png')
             .add(ElementTypeNames.BULLET_ENEMY, 'enemy_bullet.png')
             .add(ElementTypeNames.HEART, 'heart.png')
+            .add(ElementTypeNames.PAUSE_BUTTON, 'pause.png')
+            .add(ElementTypeNames.PLAY_BUTTON, 'play.png')
             .add(AnimationsNames.ANIMATIONS, 'animations.json')
             .add(SoundNames.BONUS, 'sounds/bonus.wav')
             .add(SoundNames.EXPLODE, 'sounds/explode.wav')
@@ -64,6 +65,10 @@ export default class LoaderController extends PIXI.Loader {
 
     public getTextureByTypeName(typeName: string): PIXI.Texture {
         return this.resources[typeName].texture;
+    }
+
+    public getAnimationByName(name: string): AnimatedSprite {
+        return new PIXI.AnimatedSprite(this.resources[AnimationsNames.ANIMATIONS].spritesheet.animations[name]);
     }
 
     public playSoundByName(name: string) {
@@ -83,12 +88,8 @@ export default class LoaderController extends PIXI.Loader {
         }
     }
 
-    public getAnimation(name: string): AnimatedSprite {
-        return new PIXI.AnimatedSprite(this.resources[AnimationsNames.ANIMATIONS].spritesheet.animations[name]);
-    }
-
     protected onCompleteCallBack(e: Loader): void {
-        TweenMax.delayedCall(1, () => app.stateMachine.changeState(StateNames.START_GAME_STATE));
+        app.stateMachine.changeState(StateNames.START_GAME_STATE);
     }
 
     public hideView(): void {

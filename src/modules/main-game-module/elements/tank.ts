@@ -59,7 +59,7 @@ export default class Tank extends AbstractTank {
     }
 
     public setKeyDown(e: KeyboardEvent): void {
-        if (this.isKilled) {
+        if (this.isKilled || app.isPause) {
             return;
         }
         switch (e.keyCode) {
@@ -86,13 +86,16 @@ export default class Tank extends AbstractTank {
         }
     }
 
-    public update(): void {
+    protected update(): void {
+        if (app.isPause) {
+            return;
+        }
         this.updatePossibleCollision();
         super.update();
     }
 
     public setKeyUp(e: KeyboardEvent): void {
-        if (this.isKilled) {
+        if (this.isKilled || app.isPause) {
             return;
         }
         switch (e.keyCode) {

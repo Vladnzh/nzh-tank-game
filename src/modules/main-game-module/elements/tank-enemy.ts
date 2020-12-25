@@ -7,6 +7,7 @@ import {
 import { TweenMax } from 'gsap';
 import _ from 'lodash';
 import { AbstractTank } from './abstract-tank';
+import { app } from '../../../index';
 
 export default class TankEnemy extends AbstractTank {
     protected DIRECTIONS: Array<string> = [DIRECTION_NAMES.LEFT, DIRECTION_NAMES.RIGHT, DIRECTION_NAMES.DOWN, DIRECTION_NAMES.UP];
@@ -22,20 +23,18 @@ export default class TankEnemy extends AbstractTank {
         if (this.isKilled) {
             return;
         }
-        this.onRecharge();
-        this.setDirection(this.DIRECTIONS[_.random(0, this.DIRECTIONS.length)]);
+        if (!app.isPause) {
+            this.onRecharge();
+            this.setDirection(this.DIRECTIONS[_.random(0, this.DIRECTIONS.length)]);
+        }
+
         this.loopCaller = TweenMax.delayedCall(_.random(1, 1.5), () => this.loop());
     }
 
-    public setDirection(direction: string): void {
+    protected setDirection(direction: string): void {
         this.inMove = true;
         this.currentDirection = direction;
         this.updatePossibleCollision();
-    }
-
-    public remove(): void {
-        this.loopCaller.kill();
-        super.remove();
     }
 
     protected onRecharge(): void {
@@ -43,6 +42,11 @@ export default class TankEnemy extends AbstractTank {
         const x = this.tankSprite.x;
         const y = this.tankSprite.y;
         this.bullet = new Bullet(ElementTypeNames.BULLET_ENEMY, this.currentDirection, x, y);
+    }
+
+    public remove(): void {
+        this.loopCaller.kill();
+        super.remove();
     }
 }
 

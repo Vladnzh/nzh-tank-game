@@ -49,12 +49,10 @@ export default class LoaderView extends PIXI.Container {
 
     }
 
-
     public updateProgressBar(progress: number): void {
         if (this.loaderBar) {
             this.loaderBar.width = this.loaderBarOriginalWidth / 100 * progress;
         }
     }
-
 
 }

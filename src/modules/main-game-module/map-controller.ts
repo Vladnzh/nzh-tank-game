@@ -1,21 +1,22 @@
 import { TweenMax } from 'gsap';
 import { app } from '../../index';
 import PIXI, { Container, Point, Sprite } from 'pixi.js';
-import { centeringItem, mapMatrix, textureBonusNames, textureTankNames } from '../../utils';
+import { mapMatrix, textureBonusNames, textureTankNames } from '../../utils';
 import Board from './elements/board';
 import Tank from './elements/tank';
 import { DefaultParams, DefaultTextureSize, ElementTypeNames } from '../constants';
 import TankEnemy from './elements/tank-enemy';
 import Bonus from './elements/bonus';
 import _ from 'lodash';
+import MainGameView from './main-game-view';
 
 export default class MapController {
     protected emptySpaces: Array<PIXI.Point> = [];
     protected textureTankNames: Array<string>;
     public lifeSprites: Array<Sprite> = [];
-    public view: Container;
+    public view: MainGameView;
 
-    constructor(view: Container) {
+    constructor(view: MainGameView) {
         this.view = view;
     }
 
@@ -40,7 +41,12 @@ export default class MapController {
         }
         this.view.sortChildren();
         this.bonusGenerationLoop();
+        this.view.createPauseButton();
     };
+
+    public pauseVisibleOnMap(isVisible: boolean): void {
+        this.view.pauseButton.visible = isVisible;
+    }
 
     protected bonusGenerationLoop(): void {
         if (!app.mainGameModule.currentBonusOnMap) {
@@ -112,7 +118,6 @@ export default class MapController {
         let texture = app.loader.getTextureByTypeName(ElementTypeNames.HEART);
         for (let i = 0; i < DefaultParams.MAX_AMOUNT_LIFE + 1; i++) {
             const sprite = new Sprite(texture);
-            // centeringItem(app.view, sprite);
             sprite.x += sprite.height * i;
             sprite.y = app.view.height - 50;
             sprite.visible = false;

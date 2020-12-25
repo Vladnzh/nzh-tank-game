@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import { ElementTypeNames } from './modules/constants';
 import { TypeItemsCollision } from './interfaces';
 import Bullet from './modules/main-game-module/elements/bullet';
+import { AbstractTank } from './modules/main-game-module/elements/abstract-tank';
 
 export const centeringItem = (view: HTMLCanvasElement | PIXI.Container, item: PIXI.Container): PIXI.Point => {
     const position = new PIXI.Point();
@@ -10,16 +11,30 @@ export const centeringItem = (view: HTMLCanvasElement | PIXI.Container, item: PI
     return position;
 };
 
-export const itemsIntersect = (a: any, b: any): boolean => {
-    if (!a || !b) {
+
+export const itemsIntersect = (item1: any, item2: any): boolean => {
+    if (!item1 || !item2) {
         return false;
     }
-    if (a.type === b.type) {
+    if (item1.type === item2.type) {
         return false;
     }
-    const ab = a.getBounds();
-    const bb = b.getBounds();
-    return ab.x + ab.width > bb.x && ab.x < bb.x + bb.width && ab.y + ab.height > bb.y && ab.y < bb.y + bb.height;
+    const item1Bounds = item1.getBounds();
+    const item2Bounds = item2.getBounds();
+
+    if (isAnyTank(item1)) {
+        item1Bounds.width = (item1 as AbstractTank).tankSprite.getBounds().width;
+        item1Bounds.height = (item1 as AbstractTank).tankSprite.getBounds().height + 1;
+    }
+    if (isAnyTank(item2)) {
+        item2Bounds.width = (item2 as AbstractTank).tankSprite.getBounds().width;
+        item2Bounds.height = (item2 as AbstractTank).tankSprite.getBounds().height + 1;
+    }
+
+    return item1Bounds.x + item1Bounds.width > item2Bounds.x
+        && item1Bounds.x < item2Bounds.x + item2Bounds.width
+        && item1Bounds.y + item1Bounds.height > item2Bounds.y
+        && item1Bounds.y < item2Bounds.y + item2Bounds.height;
 };
 
 export const isIgnoreTypeForBullet = (type: string): boolean => {
@@ -80,16 +95,16 @@ export const titleStyle: Object = {
 export const mapMatrix = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 2, 2, 3, 0, 0, 0, 2, 3, 2, 0, 2, 0, 2, 3, 2, 0, 0, 0, 0, 3, 2, 2, 0, 0, 1],
-    [1, 0, 0, 2, 2, 3, 0, 0, 0, 3, 3, 3, 0, 2, 0, 3, 3, 3, 0, 0, 0, 0, 3, 2, 2, 0, 0, 1],
-    [1, 0, 0, 2, 2, 3, 0, 0, 0, 2, 3, 2, 0, 2, 0, 2, 3, 2, 0, 0, 0, 0, 3, 2, 2, 0, 0, 1],
+    [1, 0, 0, 2, 2, 3, 0, 0, 0, 2, 3, 2, 0, 0, 0, 2, 3, 2, 0, 0, 0, 0, 3, 2, 2, 0, 0, 1],
+    [1, 0, 0, 2, 2, 3, 0, 0, 0, 3, 3, 3, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 3, 2, 2, 0, 0, 1],
+    [1, 0, 0, 2, 2, 3, 0, 0, 0, 2, 3, 2, 0, 0, 0, 2, 3, 2, 0, 0, 0, 0, 3, 2, 2, 0, 0, 1],
     [1, 0, 0, 2, 2, 3, 0, 0, 0, 2, 3, 2, 0, 2, 0, 2, 3, 2, 0, 0, 0, 0, 3, 2, 2, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 1],
-    [1, 0, 0, 0, 0, 4, 4, 4, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 4, 4, 4, 0, 0, 3, 3, 1],
-    [1, 1, 1, 2, 2, 4, 4, 4, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 4, 4, 4, 2, 2, 1, 1, 1],
-    [1, 3, 3, 0, 0, 4, 4, 4, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 4, 4, 4, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 4, 4, 4, 2, 3, 2, 0, 0, 0, 0, 0, 0, 2, 3, 2, 4, 4, 4, 0, 0, 3, 3, 1],
+    [1, 1, 1, 2, 2, 4, 4, 4, 2, 3, 2, 0, 0, 1, 0, 0, 0, 2, 3, 2, 4, 4, 4, 2, 2, 1, 1, 1],
+    [1, 3, 3, 0, 0, 4, 4, 4, 2, 3, 2, 0, 0, 1, 0, 0, 0, 2, 3, 2, 4, 4, 4, 0, 0, 0, 0, 1],
     [1, 3, 3, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 3, 2, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 5, 0, 0, 0, 0, 2, 0, 0, 2, 2, 3, 2, 0, 0, 1],
     [1, 0, 2, 2, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2, 2, 3, 2, 0, 0, 1],

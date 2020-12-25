@@ -1,5 +1,6 @@
 import StartGameView from './start-game-view';
 import { TimelineLite, TweenMax } from 'gsap';
+import { DefaultParams } from '../constants';
 
 export default class StartGameController {
     protected view: StartGameView;
@@ -17,7 +18,7 @@ export default class StartGameController {
         this.view.alpha = 0;
         this.view.visible = true;
         const tl = new TimelineLite;
-        tl.to(this.view, 1, {
+        tl.to(this.view, DefaultParams.TRANSITION_VIEW_DURATION, {
             alpha: 1,
         })
             .add(() => {
@@ -27,7 +28,7 @@ export default class StartGameController {
 
     public hideView(): void {
         this.view.interactiveButton(false);
-        TweenMax.to(this.view, 1, {
+        TweenMax.to(this.view, DefaultParams.TRANSITION_VIEW_DURATION, {
             alpha: 0,
             onComplete: () => {
                 this.view.visible = false;

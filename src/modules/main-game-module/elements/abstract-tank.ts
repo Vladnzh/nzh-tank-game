@@ -11,7 +11,7 @@ import { TimelineLite, TweenMax } from 'gsap';
 import { TypeItemsCollision } from '../../../interfaces';
 import Bullet from './bullet';
 import { v4 as uuidv4 } from 'uuid';
-import { itemsIntersect } from '../../../utils';
+import { isAnyTank, itemsIntersect } from '../../../utils';
 import { app } from '../../../index';
 import { AnimatedSprite } from 'pixi.js';
 import { ColorOverlayFilter } from '@pixi/filter-color-overlay';
@@ -72,11 +72,14 @@ export class AbstractTank extends PIXI.Container {
         this.updatePossibleCollision();
     }
 
-    public setSpeed(speed: number): void {
+    protected setSpeed(speed: number): void {
         this.speed = speed;
     }
 
-    public update(): void {
+    protected update(): void {
+        if (app.isPause) {
+            return;
+        }
         if (this.isDrown) {
             return;
         }
@@ -149,9 +152,9 @@ export class AbstractTank extends PIXI.Container {
         this.remove();
     }
 
-    public playExplodeAnimation() {
+    protected playExplodeAnimation() {
         app.loader.playSoundByName(SoundNames.EXPLODE);
-        const animation: AnimatedSprite = app.loader.getAnimation(AnimationsNames.EXPLODE_SPRITE);
+        const animation: AnimatedSprite = app.loader.getAnimationByName(AnimationsNames.EXPLODE_SPRITE);
         animation.anchor.set(0.5);
         animation.x = this.tankSprite.x;
         animation.y = this.tankSprite.y;
@@ -236,7 +239,7 @@ export class AbstractTank extends PIXI.Container {
         });
     }
 
-    public updatePossibleCollision(): void {
+    protected updatePossibleCollision(): void {
         this.possibleCollision = app.mainGameModule.findTankPossibleCollision(this);
     }
 

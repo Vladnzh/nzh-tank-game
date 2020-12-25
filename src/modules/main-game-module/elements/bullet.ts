@@ -6,17 +6,18 @@ import { TypeItemsCollision } from '../../../interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import TankEnemy from './tank-enemy';
 import Tank from './tank';
-import { isAnyTank } from '../../../utils';
+import { isAnyTank, itemsIntersect } from '../../../utils';
 import { TweenMax } from 'gsap';
+import { AbstractTank } from './abstract-tank';
 
 export default class Bullet {
-    public id: string;
-    protected speed: number;
     private OFFSET: number = 15;
+    public id: string;
     public type: string;
     public currentDirection: string;
     public bulletSprite: PIXI.Sprite;
     public possibleCollision: Array<TypeItemsCollision>;
+    protected speed: number;
 
     constructor(textureTypeName: string, direction: string, x: number, y: number) {
         this.id = uuidv4();
@@ -32,13 +33,12 @@ export default class Bullet {
         app.mainGameModule.addBullet(this);
         this.updatePossibleCollision();
         TweenMax.delayedCall(0.8, () => this.updatePossibleCollision());
-        app.loader.playSoundByName(SoundNames.SHOT)
+        app.loader.playSoundByName(SoundNames.SHOT);
     }
 
     public updatePossibleCollision() {
         this.possibleCollision = app.mainGameModule.findBulletPossibleCollision(this);
     }
-
 
     protected setPosition(x: number, y: number) {
         switch (this.currentDirection) {
@@ -66,7 +66,7 @@ export default class Bullet {
     }
 
     public playAnimation() {
-        const animation: AnimatedSprite = app.loader.getAnimation(AnimationsNames.EXPLODE_SMALL_SPRITE);
+        const animation: AnimatedSprite = app.loader.getAnimationByName(AnimationsNames.EXPLODE_SMALL_SPRITE);
         animation.anchor.set(0.5);
         animation.x = this.bulletSprite.x;
         animation.y = this.bulletSprite.y;
@@ -76,18 +76,6 @@ export default class Bullet {
         animation.onComplete = () => {
             app.mainGameView.removeChild(animation);
         };
-    }
-
-    private itemsIntersect(a: any, b: any): boolean {
-        if (!a || !b) {
-            return false;
-        }
-        if (a.type === b.type) {
-            return false;
-        }
-        const ab = a.getBounds();
-        const bb = b.getBounds();
-        return ab.x + ab.width > bb.x && ab.x < bb.x + bb.width && ab.y + ab.height > bb.y && ab.y < bb.y + bb.height;
     }
 
     public onExplode(): void {
@@ -100,7 +88,7 @@ export default class Bullet {
     protected onCollisionHappened(collisionItem: TypeItemsCollision): void {
         if ((isAnyTank(collisionItem))
             && this.type !== ElementTypeNames.BULLET_ENEMY) {
-            (collisionItem as TankEnemy).onExplode();
+            (collisionItem as AbstractTank).onExplode();
         }
         if (collisionItem.type === ElementTypeNames.TANK) {
             (collisionItem as Tank).onExplode();
@@ -115,8 +103,11 @@ export default class Bullet {
     }
 
     public update(): void {
+        if(app.isPause){
+            return
+        }
         const collisionItem = this.possibleCollision.find((item: TypeItemsCollision) =>
-            this.itemsIntersect(this.bulletSprite, item));
+            itemsIntersect(this.bulletSprite, item));
 
         if (collisionItem) {
             this.onCollisionHappened(collisionItem);

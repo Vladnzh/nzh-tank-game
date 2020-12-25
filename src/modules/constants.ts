@@ -41,6 +41,8 @@ export class ElementTypeNames {
     static readonly BULLET = 'bullet';
     static readonly BULLET_ENEMY = 'bulletEnemy';
     static readonly HEART = 'heart';
+    static readonly PAUSE_BUTTON = 'pause';
+    static readonly PLAY_BUTTON = 'play';
 }
 
 export class SoundNames {
@@ -69,10 +71,11 @@ export class LoaderNames {
 }
 
 export class DefaultParams {
+    static readonly TRANSITION_VIEW_DURATION: number = 1;
     static readonly TANK_SPEED: number = 1;
     static readonly BULLET_SPEED: number = 5;
     static readonly BONUS_EXPIRATION_TIME: number = 4;
-    static readonly BONUS_IMMORTAL_EXPIRATION_TIME: number = 2;
+    static readonly BONUS_IMMORTAL_EXPIRATION_TIME: number = 4;
     static readonly RECHARGE_TIME: number = 1.5;
     static readonly AMOUNT_LIFE: number = 0;
     static readonly MAX_AMOUNT_LIFE: number = 3;
